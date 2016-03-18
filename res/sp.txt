@@ -1,0 +1,181 @@
+1 - Blue
+Tucuruvi
+Parada Inglesa
+Jardim São Paulo - Ayrton Sena
+Carandiru
+Portuguesa - Tietê
+Armênia
+Tiradentes
+Luz
+São Bento
+Sé
+Liberdade
+São Joaquim
+Vergueiro
+Paraíso
+Ana Rosa
+Vila Mariana
+Santa Cruz
+Praça da Árvore
+Saúde
+São Judas
+Conceição
+Jabaquara
+2 - Green
+Vila Madalena
+Sumaré
+Clínicas
+Consolação (Paulista)
+Trianon - Masp
+Brigadeiro
+Paraíso
+Ana Rosa
+Chácara Klabin
+Santos - Imigrantes
+Alto do Ipiranga
+Tamanduateí
+Vila Prudente
+3 - Red
+Palmeiras - Barra Funda
+Mal. Deodoro
+Santa Cecília
+República
+Anhangabaú
+Sé
+Pedro II
+Brás
+Bresser - Mooca
+Belém
+Tatuapé
+Carrão
+Penha
+Vila Matilde
+Guilhermina - Esperança
+Patriarca
+Artur Alvim
+Corinthians - Itaquera
+4 - Yellow
+Butantã
+Pinheiros
+Faria Lima
+Paulista (Consolação)
+República
+Luz
+5 - Lilac
+Capão Redondo
+Campo Limpo
+Vila das Belezas
+Giovanni Gronchi
+Santo Amaro
+Largo Treze
+Aldolfo Pinheiro
+7 - Ruby
+Jundiaí
+Várzea Paulista
+Botujuru
+Francisco Morato
+Baltazar Fidélis
+Franco da Rocha
+Caieiras
+Perus
+Vila Aurora
+Jaraguá
+Vila Clarice
+Pirituba
+Piqueri
+Lapa
+Água Branca
+Palmeiras - Barra Funda
+Luz
+8 - Diamond
+Amador Bueno
+Santa Rita
+Ambuitá
+Cimenrita
+Santa Rita
+Itapevi
+Eng Cardoso
+Sagrado Coração
+Jandira
+Jardim Silveira
+Jardim Belval
+Barueri
+Antonio João
+Santa Terezinha
+Carapicuíba
+Gen. Miguel Costa
+Quitaúna
+Com. Sampaio
+Osasco
+Pres. Altino
+Imperatriz - Leolpodina
+Domingos de Moraes
+Lapa
+Palmeiras - Barra Funda
+Júlio Prestes
+9 - Emerald
+Osasco
+Pres. Altino
+Ceasa
+Villa-Lobos - Jaguaré
+Cidade Universitária
+Pinheiros
+Hebraica - Rebouças
+Cidade Jardim
+Vila Olímpia
+Berrini
+Morumbi
+Granja Julieta
+Santo Amaro
+Socorro
+Jurubatuba
+Autódromo
+Primavera - Interlagos
+Grajaú
+10 - Turquoise
+Brás
+Mooca
+Ipiranga
+Tamanduateí
+São Caetano
+Utinga
+Prefeito Saladino
+Santo André
+Capuava
+Mauá
+Guapituba
+Ribeirão Pires
+Rio Grande da Serra
+11 - Coral
+Luz
+Brás
+Tatuapé
+Corinthians - Itaquera
+Dom Bosco
+José Bonifácio
+Guaianazes
+Antonio Gianetti Neto
+Ferraz de Vasconcelos
+Poá
+Calmon Viana
+Suzano
+Junidapeba
+Braz Cubas
+Mogi das Cruzes
+Estudantes
+12 - Sapphire
+Brás
+Tatuapé
+Eng Goulart
+USP Leste
+Comendador Ermelino
+São Miguel Paulista
+Jardim Helena - Vila Mara
+Jardim Romano
+Eng Manoel Feio
+Itaquaquecetuba
+Aracaré
+Calmon Viana
+15 - Silver
+Vila Prudente
+Oratório
