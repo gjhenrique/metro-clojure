@@ -25,7 +25,7 @@ Jabaquara
 Vila Madalena
 Sumaré
 Clínicas
-Consolação (Paulista)
+Consolação (Yellow)
 Trianon - Masp
 Brigadeiro
 Paraíso
@@ -58,7 +58,7 @@ Corinthians - Itaquera
 Butantã
 Pinheiros
 Faria Lima
-Paulista (Consolação)
+Paulista (Green)
 República
 Luz
 5 - Lilac
