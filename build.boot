@@ -15,17 +15,16 @@
                        (and (some #{station} (:stations %))
                             (not (= line-name (:name %))))
                        (if-let
-                           [line-replacer (re-find #"\(\w+\)" station)]
-                         (.substring line-replacer 1 (- (.length line-replacer) 1)))
-                     )
-       lines))
-)
+                        [line-replacer (re-find #"\(\w+\)" station)]
+                         (.substring line-replacer 1 (- (.length line-replacer) 1))))
+                     lines)))
 
 (defn association-between-lines
   [line lines]
   (assoc line :stations
-         (map
-          #(assoc {} :name % :connections (find-connections (:name line) % lines)) (:stations line))))
+         (map #(assoc {}
+                      :name (str/replace-first % #" \(\w+\)" "")
+                      :connections (find-connections (:name line) % lines)) (:stations line))))
 
 (deftask to-json
   [c city CITY str "The city with the subways"]
@@ -33,22 +32,19 @@
     (let [file-contents (-> (io/resource (str city ".txt"))
                             (io/file)
                             (slurp))]
-      (json/write-str
-       (let [ready
-        (let [semi-ready (for [[station-info stations] (partition 2
-                              (partition-by #(re-find #"\d+ - \w*" %) (str/split-lines file-contents)))]
-         (let [info (map str/trim (str/split (first station-info) #"-"))]
-           (assoc {} :position (first info) :name (second info) :stations stations)))]
-          semi-ready)]
-         (map #(association-between-lines % ready) ready))
-       )
-      )
+      (with-open [w (io/writer (str "res/" city ".json"))]
+        (.write w (json/write-str
+                   (let [ready
+                         (let [semi-ready (for [[station-info stations] (partition 2
+                                                                                   (partition-by #(re-find #"\d+ - \w*" %) (str/split-lines file-contents)))]
+                                            (let [info (map str/trim (str/split (first station-info) #"-"))]
+                                              (assoc {} :position (first info) :name (second info) :stations stations)))]
+                           semi-ready)]
+                     (map #(association-between-lines % ready) ready))))))
     fileset))
-
 
 (deftask run []
   (with-pre-wrap fileset
     (sandbox.core/-main)
     fileset))
-
 
