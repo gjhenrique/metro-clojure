@@ -25,7 +25,7 @@ Jabaquara
 Vila Madalena
 Sumaré
 Clínicas
-Consolação (Yellow)
+Paulista - Consolação
 Trianon - Masp
 Brigadeiro
 Paraíso
@@ -58,7 +58,7 @@ Corinthians - Itaquera
 Butantã
 Pinheiros
 Faria Lima
-Paulista (Green)
+Paulista - Consolação
 República
 Luz
 5 - Lilac
@@ -72,6 +72,7 @@ Aldolfo Pinheiro
 7 - Ruby
 Jundiaí
 Várzea Paulista
+Campo Limpo Paulista
 Botujuru
 Francisco Morato
 Baltazar Fidélis
@@ -89,9 +90,6 @@ Palmeiras - Barra Funda
 Luz
 8 - Diamond
 Amador Bueno
-Santa Rita
-Ambuitá
-Cimenrita
 Santa Rita
 Itapevi
 Eng Cardoso
