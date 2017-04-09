@@ -1,4 +1,4 @@
-1 - Blue
+*Blue
 Tucuruvi
 Parada Inglesa
 Jardim São Paulo - Ayrton Sena
@@ -21,7 +21,7 @@ Saúde
 São Judas
 Conceição
 Jabaquara
-2 - Green
+*Green
 Vila Madalena
 Sumaré
 Clínicas
@@ -35,7 +35,7 @@ Santos - Imigrantes
 Alto do Ipiranga
 Tamanduateí
 Vila Prudente
-3 - Red
+*Red
 Palmeiras - Barra Funda
 Mal. Deodoro
 Santa Cecília
@@ -54,14 +54,14 @@ Guilhermina - Esperança
 Patriarca
 Artur Alvim
 Corinthians - Itaquera
-4 - Yellow
+*Yellow
 Butantã
 Pinheiros
 Faria Lima
 Paulista - Consolação
 República
 Luz
-5 - Lilac
+*Lilac
 Capão Redondo
 Campo Limpo
 Vila das Belezas
@@ -69,7 +69,7 @@ Giovanni Gronchi
 Santo Amaro
 Largo Treze
 Aldolfo Pinheiro
-7 - Ruby
+*Ruby
 Jundiaí
 Várzea Paulista
 Campo Limpo Paulista
@@ -88,7 +88,7 @@ Lapa
 Água Branca
 Palmeiras - Barra Funda
 Luz
-8 - Diamond
+*Diamond
 Amador Bueno
 Santa Rita
 Itapevi
@@ -111,7 +111,7 @@ Domingos de Moraes
 Lapa
 Palmeiras - Barra Funda
 Júlio Prestes
-9 - Emerald
+*Emerald
 Osasco
 Pres. Altino
 Ceasa
@@ -130,7 +130,7 @@ Jurubatuba
 Autódromo
 Primavera - Interlagos
 Grajaú
-10 - Turquoise
+*Turquoise
 Brás
 Mooca
 Ipiranga
@@ -144,7 +144,7 @@ Mauá
 Guapituba
 Ribeirão Pires
 Rio Grande da Serra
-11 - Coral
+*Coral
 Luz
 Brás
 Tatuapé
@@ -161,7 +161,7 @@ Junidapeba
 Braz Cubas
 Mogi das Cruzes
 Estudantes
-12 - Sapphire
+*Sapphire
 Brás
 Tatuapé
 Eng Goulart
@@ -174,6 +174,6 @@ Eng Manoel Feio
 Itaquaquecetuba
 Aracaré
 Calmon Viana
-15 - Silver
+*Silver
 Vila Prudente
 Oratório
