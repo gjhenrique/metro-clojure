@@ -16,7 +16,7 @@
   [file-name]
   (partition 2
              (partition-by
-                #(re-find (re-pattrn (str regex-line-separator "\w*")) %)
+                #(re-find (re-pattern (str regex-line-separator #"\w*")) %)
                 (file-contents file-name))))
 
 (defn filter-stations
