@@ -1,6 +1,7 @@
 (ns metro.file
   (:require [clojure.java.io :as io]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [clojure.data.json :as json])
   (:gen-class))
 
 (def regex-line-separator #"\*")
@@ -11,6 +12,12 @@
       (io/file)
       (slurp)
       (str/split-lines)))
+
+(defn read-json-file
+  [file-name]
+  (json/read-json (-> file-name
+                      (io/file)
+                      (slurp))))
 
 (defn loop-lines
   [file-name]

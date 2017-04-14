@@ -1,32 +1,43 @@
 (ns metro.graph
-  (:require [clojure.java.io :as io]
-            [loom.graph :refer :all]
-            [loom.io :refer :all]
-            [loom.label :refer :all]
-            [loom.attr :refer :all]
-            [loom.alg :refer :all]
-            [clojure.data.json :as json]
-            [clojure.string :as str])
+  (:require [loom.graph :as graph]
+            [loom.io :as io]
+            [loom.attr :as attr])
   (:gen-class))
-
-(defn subway-schema
-  []
-  (json/read-json (-> "res/sp.json"
-                      (io/file)
-                      (slurp))))
 
 (defn print-chart
   [graph]
-  (view graph)) 
+  (io/view graph))
 
-(defn build-graph-line
-  [line]
-  (let [stations (:stations line)
-        name (:name line)]
-    (add-attr-to-nodes 
-     (apply digraph (partition 2 1 stations))
-     :line name stations)))
+(defn lines-inside
+  [station subway-info]
+  (map :name
+       (filter
+        (fn [line]
+          (some #(= station %) (:stations line)))
+        subway-info)))
+
+(defn all-stations
+  [subway-info]
+  (set
+   (flatten
+    (map :stations subway-info))))
+
+(defn build-attributes
+  [graph subway-info]
+  (reduce
+   (fn [g station]
+     (attr/add-attr g station :lines (lines-inside station subway-info)))
+   graph
+   (all-stations subway-info)))
+
+(defn build-raw-graph
+  [subway-info]
+  (apply graph/digraph (map
+                        #(apply graph/digraph (partition 2 1 (:stations %)))
+                        subway-info)))
 
 (defn build-subway-graph
   [subway-info]
-  (apply digraph (map build-graph-line subway-info)))
+  (-> subway-info
+      (build-raw-graph)
+      (build-attributes subway-info)))
