@@ -3,13 +3,6 @@
             [loom.graph :as graph]
             [loom.attr :as attr]))
 
-;; TODO: Give it a better name
-;; Find initial station
-;; Predecessors
-;; Find initial 
-;;   Begin algorithm
-;;   Paint as visited if all the predecessors are visited or if it does not have predecessor
-
 (defn find-predecessor
   [g node line]
   (first (filter
@@ -21,14 +14,6 @@
   (first (filter
           (fn [p] (some #(= line %) (attr/attr g p :lines)))
           (graph/successors g node))))
-
-;; (defn find-predecessor)
-;; (defn previous-station
-;;   [g node line]
-;;   (let [predecessor (find-predecessor g node line)]
-;;     (if (nil? predecessor)
-;;       node
-;;       (find-first-station g predecessor line))))
 
 (defn visited?
   [g node]
@@ -50,18 +35,23 @@
       (and (not (nil? predecessor)) (not (visited? graph predecessor)))
       (really-traverse-graph (assoc state :current-node predecessor))
 
+      ;; Checking if there are more than one of successors
+
       ;; Finding next successor
       (and (visited? graph current-node) (not (nil? successor)))
       (really-traverse-graph (assoc state :current-node successor))
 
-      ;; Return the same
+      ;; If there are no more successors, come back until you find one that has
+
+      ;; If the node is visited and it does not have any successors, mark it as the end
+
+      ;; Return the current-node
       :else
       (assoc state :graph (attr/add-attr graph current-node :visited true))
   )))
 
 (defn traverse-subway-graph
   ([params]
-  ;;  (traverse-subway-graph (assoc (random-initial-station g) :graph g )))
    (if (instance? loom.graph.BasicEditableDigraph params) 
      (traverse-subway-graph (assoc (random-initial-station params) :graph g))
      (really-traverse-graph params))))
