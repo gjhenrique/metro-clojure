@@ -19,23 +19,29 @@
   [g node]
   (attr/attr g node :visited))
 
+;; TODO: Move this to graph file
+(defn lines
+  [g node]
+  (attr/attr g node :lines))
+
 (defn random-initial-station
   "Pick a random station to begin the algorithm"
   [g]
   (let [node (first (graph/nodes g))]
-    {:current-node node :current-line (first (attr/attr g node :lines))})) 
+    {:current-node node :current-line (lines g node)})) 
 
 (defn really-traverse-graph
   [state]
   (let [{:keys [graph current-node current-line]} state
-        predecessor (find-predecessor graph current-node current-line)
-        successor (find-successor graph current-node current-line)]
+        line (first current-line)
+        predecessor (find-predecessor graph current-node line)
+        successor (find-successor graph current-node line)]
     (cond
       ;; Predecessor is not visited yet
       (and (not (nil? predecessor)) (not (visited? graph predecessor)))
       (really-traverse-graph (assoc state :current-node predecessor))
 
-      ;; Checking if there are more than one of successors
+      ;; Checking if there are other successors
 
       ;; Finding next successor
       (and (visited? graph current-node) (not (nil? successor)))
@@ -47,11 +53,11 @@
 
       ;; Return the current-node
       :else
-      (assoc state :graph (attr/add-attr graph current-node :visited true))
+      (assoc state :current-line (lines graph current-node) :graph (attr/add-attr graph current-node :visited true))
   )))
 
 (defn traverse-subway-graph
   ([params]
    (if (instance? loom.graph.BasicEditableDigraph params) 
-     (traverse-subway-graph (assoc (random-initial-station params) :graph g))
+     (traverse-subway-graph (assoc (random-initial-station params) :graph params))
      (really-traverse-graph params))))

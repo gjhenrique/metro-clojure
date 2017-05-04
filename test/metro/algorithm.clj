@@ -2,33 +2,28 @@
   (:require  [clojure.test :as t]
              [metro.graph :refer [build-subway-graph]]))
 
-(def linear-g (build-subway-graph [{:name "Blue" :stations ["A" "B" "C"]}]))
-(def expected-g (map (fn [st] {:name "Blue" :station st}) ["A" "B" "C"])) 
+(def linear-g [{:name "Blue" :stations ["A" "B" "C"]}])
+(def expected-linear-g [{:node "A" :line '("Blue")} {:node "B" :line '("Blue")} {:node "C" :line '("Blue")}])
 
-(loom.graph/successors linear-g "A")
+(defn test-graph
+  [g expected-values]
+  (reduce 
+   (fn [state value]
+     (t/is (= (:current-node state) (:node value)))
+     (t/is (= (:current-line state) (:line value)))
+     (traverse-subway-graph state))
+   (traverse-subway-graph g)
+   expected-values))
 
 (t/deftest initial-simple-traverse
-  (let [state (traverse-subway-graph linear-g)]
-    (t/are [x y] (= x y)
-              "A" (:current-node state)
-              "Blue" (:current-line state))))
+  (test-graph (metro.graph/build-subway-graph linear-g) expected-linear-g))
 
-(t/deftest second-simple-traverse
-  (let [state
-        (-> linear-g
-            (traverse-subway-graph)
-            (traverse-subway-graph))]
-    (t/are [x y] (= x y)
-              "B" (:current-node state)
-              "Blue" (:current-line state))))
+(def merge-g [{:name "Blue" :stations ["A" "B" "C"]} {:name "Red" :stations ["D" "B" "E"]}])
+(def expected-merge-g [{:node "D" :line '("Red")} {:node "A" :line '("Blue")} {:node "B" :line '("Blue" "Red")}])
 
+;; (def g (metro.graph/build-subway-graph merge-g)) 
+;; (-> g
+;;     (traverse-subway-graph) 
+;;     (traverse-subway-graph)) 
 
-(t/deftest third-simple-traverse
-  (let [state
-        (-> linear-g
-            (traverse-subway-graph)
-            (traverse-subway-graph)
-            (traverse-subway-graph))]
-    (t/are [x y] (= x y)
-              "C" (:current-node state)
-              "Blue" (:current-line state))))
+;; (lines (metro.graph/build-subway-graph merge-g) )
