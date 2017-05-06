@@ -1,6 +1,7 @@
 (ns metro.algorithm
   (:require  [clojure.test :as t]
-             [metro.graph :refer [build-subway-graph]]))
+             [metro.graph :refer [build-subway-graph]]
+             [loom.attr :as attr]))
 
 (def linear-g [{:name "Blue" :stations ["A" "B" "C"]}])
 (def expected-linear-g [{:node "A" :line '("Blue")} {:node "B" :line '("Blue")} {:node "C" :line '("Blue")}])
@@ -18,12 +19,23 @@
 (t/deftest initial-simple-traverse
   (test-graph (metro.graph/build-subway-graph linear-g) expected-linear-g))
 
-(def merge-g [{:name "Blue" :stations ["A" "B" "C"]} {:name "Red" :stations ["D" "B" "E"]}])
-(def expected-merge-g [{:node "D" :line '("Red")} {:node "A" :line '("Blue")} {:node "B" :line '("Blue" "Red")}])
 
-;; (def g (metro.graph/build-subway-graph merge-g)) 
-;; (-> g
-;;     (traverse-subway-graph) 
-;;     (traverse-subway-graph)) 
+(def merge-g [{:name "Blue" :stations ["A" "B"]}
+              {:name "Red" :stations ["C" "B"]}])
+(def expected-merge-g [{:node "C" :line '("Red")}
+                       {:node "A" :line '("Blue")}
+                       {:node "B" :line '("Blue" "Red")}])
 
-;; (lines (metro.graph/build-subway-graph merge-g) )
+(t/deftest merge-traverse
+  (test-graph (metro.graph/build-subway-graph merge-g) expected-merge-g))
+
+
+(def fallback-g [{:name "Blue" :stations ["A" "B"]}
+                 {:name "Red" :stations ["A" "C"]}])
+
+(def expected-fallback-g [{:node "A" :line '("Blue" "Red")}
+                          {:node "C" :line '("Red")}
+                          {:node "B" :line '("Blue")}])
+
+(t/deftest fallback-traverse
+  (test-graph (metro.graph/build-subway-graph fallback-g) expected-fallback-g))

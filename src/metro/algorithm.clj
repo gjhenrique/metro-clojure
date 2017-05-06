@@ -4,16 +4,15 @@
             [loom.attr :as attr]))
 
 (defn find-predecessor
-  [g node line]
+  [g node]
   (first (filter
-          (fn [p] (some #(= line %) (attr/attr g p :lines)))
+          (fn [p] (not (visited? g p)))
           (graph/predecessors g node))))
 
-(defn find-successor
-  [g node line]
-  (first (filter
-          (fn [p] (some #(= line %) (attr/attr g p :lines)))
-          (graph/successors g node))))
+(defn find-successors
+  [g node]
+  (filter (fn [s] (not (visited? g s)))
+          (graph/successors g node)))
 
 (defn visited?
   [g node]
@@ -28,36 +27,40 @@
   "Pick a random station to begin the algorithm"
   [g]
   (let [node (first (graph/nodes g))]
-    {:current-node node :current-line (lines g node)})) 
+    {:pending-nodes () :current-node node :current-line (lines g node)}))
 
 (defn really-traverse-graph
   [state]
-  (let [{:keys [graph current-node current-line]} state
-        line (first current-line)
-        predecessor (find-predecessor graph current-node line)
-        successor (find-successor graph current-node line)]
+  (let [{:keys [graph current-node current-line pending-nodes]} state
+        predecessor (find-predecessor graph current-node)
+        successors (find-successors graph current-node)]
     (cond
-      ;; Predecessor is not visited yet
-      (and (not (nil? predecessor)) (not (visited? graph predecessor)))
+      (and (not (nil? predecessor)))
       (really-traverse-graph (assoc state :current-node predecessor))
 
-      ;; Checking if there are other successors
+      (and (visited? graph current-node) (seq successors))
+      (really-traverse-graph (assoc state
+                                    :current-node (first successors)
+                                    :pending-nodes (concat pending-nodes (rest successors))))
 
-      ;; Finding next successor
-      (and (visited? graph current-node) (not (nil? successor)))
-      (really-traverse-graph (assoc state :current-node successor))
+      (and (empty? successors) (empty? pending-nodes))
+      (assoc state
+             :current-line (lines graph current-node)
+             :graph (attr/add-attr graph current-node :visited true)
+             :end true)
 
-      ;; If there are no more successors, come back until you find one that has
+      (and (visited? graph current-node) (empty? successors))
+      (really-traverse-graph (assoc state
+                                    :current-node (first pending-nodes)
+                                    :pending-nodes (rest pending-nodes)))
 
-      ;; If the node is visited and it does not have any successors, mark it as the end
-
-      ;; Return the current-node
       :else
-      (assoc state :current-line (lines graph current-node) :graph (attr/add-attr graph current-node :visited true))
-  )))
+      (assoc state
+             :current-line (lines graph current-node)
+             :graph (attr/add-attr graph current-node :visited true)))))
 
 (defn traverse-subway-graph
   ([params]
-   (if (instance? loom.graph.BasicEditableDigraph params) 
+   (if (instance? loom.graph.BasicEditableDigraph params)
      (traverse-subway-graph (assoc (random-initial-station params) :graph params))
      (really-traverse-graph params))))
