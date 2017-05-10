@@ -3,6 +3,10 @@
             [loom.graph :as graph]
             [loom.attr :as attr]))
 
+(defn visited?
+  [g node]
+  (attr/attr g node :visited))
+
 (defn find-predecessor
   [g node]
   (first (filter
@@ -13,10 +17,6 @@
   [g node]
   (filter (fn [s] (not (visited? g s)))
           (graph/successors g node)))
-
-(defn visited?
-  [g node]
-  (attr/attr g node :visited))
 
 ;; TODO: Move this to graph file
 (defn lines
