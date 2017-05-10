@@ -6,9 +6,9 @@
 (def linear-g [{:name "Blue" :stations ["A" "B" "C"]}])
 (def expected-linear-g [{:node "A" :line '("Blue")} {:node "B" :line '("Blue")} {:node "C" :line '("Blue")}])
 
-(defn test-graph
+(defn test-traversal-values
   [g expected-values]
-  (reduce 
+  (reduce
    (fn [state value]
      (t/is (= (:current-node state) (:node value)))
      (t/is (= (:current-line state) (:line value)))
@@ -16,8 +16,13 @@
    (traverse-subway-graph g)
    expected-values))
 
+(defn test-traversal
+  [g expected-values]
+  (let [state (test-traversal-values g expected-values)]
+    (t/is (= (:end state) true))))
+
 (t/deftest initial-simple-traverse
-  (test-graph (metro.graph/build-subway-graph linear-g) expected-linear-g))
+  (test-traversal (metro.graph/build-subway-graph linear-g) expected-linear-g))
 
 
 (def merge-g [{:name "Blue" :stations ["A" "B"]}
@@ -27,7 +32,7 @@
                        {:node "B" :line '("Blue" "Red")}])
 
 (t/deftest merge-traverse
-  (test-graph (metro.graph/build-subway-graph merge-g) expected-merge-g))
+  (test-traversal (metro.graph/build-subway-graph merge-g) expected-merge-g))
 
 
 (def fallback-g [{:name "Blue" :stations ["A" "B"]}
@@ -38,4 +43,4 @@
                           {:node "B" :line '("Blue")}])
 
 (t/deftest fallback-traverse
-  (test-graph (metro.graph/build-subway-graph fallback-g) expected-fallback-g))
+  (test-traversal (metro.graph/build-subway-graph fallback-g) expected-fallback-g))
