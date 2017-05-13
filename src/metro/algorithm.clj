@@ -1,7 +1,8 @@
 (ns metro.algorithm
   (:require [loom.alg :as alg]
             [loom.graph :as graph]
-            [loom.attr :as attr]))
+            [loom.attr :as attr]
+            [metro.graph :as g]))
 
 (defn visited?
   [g node]
@@ -64,3 +65,13 @@
    (if (instance? loom.graph.BasicEditableDigraph params)
      (traverse-subway-graph (assoc (random-initial-station params) :graph params))
      (really-traverse-graph params))))
+
+;; TODO: test this
+(defn seq-graph
+  ([info]
+  (seq-graph [] (g/build-subway-graph info)))
+  ([result state]
+  (if (:end state)
+    result
+    (let [new-state (traverse-subway-graph state)]
+      (seq-graph (conj result [(:current-node new-state) (:current-line new-state)]) new-state)))))
