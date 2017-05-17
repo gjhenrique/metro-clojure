@@ -6,6 +6,7 @@
                  [org.clojure/data.json "0.2.6"]
                  [org.clojure/test.check "0.9.0" :scope "test"]
                  [tolitius/boot-check "0.1.4"]
+                 [me.raynes/fs "1.4.6"]
                  [clj-jgit "0.8.9"]])
 
 (require '[clojure.java.io :as io]
