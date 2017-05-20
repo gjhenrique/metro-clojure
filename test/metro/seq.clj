@@ -26,7 +26,7 @@
 (t/deftest reverse-seq
   (t/is
    (=
-    (reverse (map :station g))
+    (map :station (reverse g))
     ["C" "E" "B" "D" "A"])))
 
 (t/deftest reduce-seq
