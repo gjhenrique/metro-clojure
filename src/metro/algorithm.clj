@@ -30,12 +30,13 @@
   (let [node (first (graph/nodes g))]
     {:pending-nodes () :current-node node :current-line (lines g node)}))
 
-(defn really-traverse-graph
+(defn traverse-subway-graph
   [state]
-  (let [{:keys [graph current-node current-line pending-nodes]} state
+  (let [{:keys [graph current-node current-line pending-nodes end]} state
         predecessor (find-predecessor graph current-node)
         successors (find-successors graph current-node)]
     (cond
+      end nil
       (and (not (nil? predecessor)))
       (really-traverse-graph (assoc state :current-node predecessor))
 
@@ -60,18 +61,8 @@
              :current-line (lines graph current-node)
              :graph (attr/add-attr graph current-node :visited true)))))
 
-(defn traverse-subway-graph
-  ([params]
-   (if (instance? loom.graph.BasicEditableDigraph params)
-     (traverse-subway-graph (assoc (random-initial-station params) :graph params))
-     (really-traverse-graph params))))
+(defn initial-subway-graph
+  [config]
+  (let [graph (metro.graph/build-subway-graph config)]
+    (assoc (random-initial-station graph) :graph graph)))
 
-;; TODO: test this
-(defn seq-graph
-  ([info]
-  (seq-graph [] (g/build-subway-graph info)))
-  ([result state]
-  (if (:end state)
-    result
-    (let [new-state (traverse-subway-graph state)]
-      (seq-graph (conj result [(:current-node new-state) (:current-line new-state)]) new-state)))))
