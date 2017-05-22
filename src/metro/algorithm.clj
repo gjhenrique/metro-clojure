@@ -38,10 +38,10 @@
     (cond
       end nil
       (and (not (nil? predecessor)))
-      (really-traverse-graph (assoc state :current-node predecessor))
+      (traverse-subway-graph (assoc state :current-node predecessor))
 
       (and (visited? graph current-node) (seq successors))
-      (really-traverse-graph (assoc state
+      (traverse-subway-graph (assoc state
                                     :current-node (first successors)
                                     :pending-nodes (concat pending-nodes (rest successors))))
 
@@ -52,7 +52,7 @@
              :end true)
 
       (and (visited? graph current-node) (empty? successors))
-      (really-traverse-graph (assoc state
+      (traverse-subway-graph (assoc state
                                     :current-node (first pending-nodes)
                                     :pending-nodes (rest pending-nodes)))
 

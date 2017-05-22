@@ -7,6 +7,7 @@
                  [org.clojure/test.check "0.9.0" :scope "test"]
                  [tolitius/boot-check "0.1.4"]
                  [me.raynes/fs "1.4.6"]
+                 [org.eclipse.jgit/org.eclipse.jgit.pgm "4.8.0.201705170830-rc1"]
                  [clj-jgit "0.8.9"]])
 
 (require '[clojure.java.io :as io]
