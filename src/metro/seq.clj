@@ -13,7 +13,7 @@
   (first [self] {:station (:current-node state)
                  :line (:current-line state)})
 
-  (seq [self] (when self self)))
+  (seq [self] self))
 
 
 (defmethod print-method MetroGraph [o, ^java.io.Writer w]
