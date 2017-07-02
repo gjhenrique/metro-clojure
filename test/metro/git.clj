@@ -4,33 +4,28 @@
             [clojure.test :as t]
             [clj-jgit.porcelain :as git]))
 
-(def base_folder (str (.getParent (java.io.File. *file*)) "/test_repo/")) 
+
+(def base-folder (str (.getParent (java.io.File. *file*)) "/test_repo/"))
+
+(defn call-git-commands [metro-seq]
+  (file/delete-dir base_folder)
+  (build-git-operations (metro.seq/seq-graph metro-seq) base-folder))
+
 (def linear-g [{:name "Blue" :stations ["A" "B" "C"]}])
 
-(def seqa (metro.seq/seq-graph linear-g)) 
+(t/deftest simple-git-operations
+  (let [repo (call-git-commands linear-g)]
+    (t/is (instance? org.eclipse.jgit.api.Git repo))
 
-;; (first (sut/build-repo base_folder seqa))
+    (t/is (= (sut/list-branches repo) '("Blue")))
 
-;; (def repo (git/git-init base_folder))
+    (t/is (= (count (git/git-log repo)) 3))
 
-;; (git/git-commit repo "Initial commit") 
+    (t/is (= (map #(.getShortMessage %) (git/git-log repo)  '("C" "B" "A"))))))
 
-;; (git/git-branch-delete repo ["Blue"] true) 
-;; (git/git-branch-create repo "Blue") 
+(def merge-g [{:name "Blue" :stations ["A" "B"]}
+              {:name "Red" :stations ["C" "B"]}])
 
-
-;; (def commit 
-;; (->
-;;  repo
-;;  (.commit)
-;;  (.setMessage "Oi")
-;;  )) 
-
-;; (-> repo
-;;     (.checkout)
-;;     (.setName "Blue")
-;;     ;; (.setCreateBranch true)
-;;     (.setOrphan true)
-;;     (.call)) 
-
-;; (file/delete-dir base_folder)
+(t/deftest merge-git-operations
+  (let [repo (call-git-commands merge-g)]
+    (t/is (= (sut/list-branches repo) '("Blue" "Red")))))

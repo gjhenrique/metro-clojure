@@ -1,46 +1,52 @@
 (ns metro.git
   (:require [metro.algorithm :as algo]
             [metro.seq :as seq]
-            [clj-jgit.porcelain :as git]))
+            [clojure.string :as str]
+            [me.raynes.fs :as file]
+            [clj-jgit.porcelain :as git])
+  (:import [org.eclipse.jgit.api Git InitCommand]))
 
+(defn list-branches
+  [repo]
+  (map
+   #(str/replace (.getName %) #"refs/heads/" "")
+   (git/git-branch-list repo)))
 
-(clojure.set/difference (set [1 2 3]) #{2 3 5}) 
+(defn branch-exists?
+  [repo branch-name]
+  (some #(= % branch-name) (list-branches repo)))
 
-(clojure.set/union #{1 2 3} '(3 5)) 
+(defn my-git-checkout
+  [^Git repo branch-name orphan]
+  (-> repo
+      (.checkout)
+      (.setName branch-name)
+      (.setOrphan orphan)
+      (.call)))
 
-(defn create-new-branches [lines]
-  (map #(println (str "git checkout --orphan " %)) lines))
+;; private
+(defn create-git-commands
+  [repo station]
+  (let [commit-name (:station station)
+        branches (:line station)]
+    (cond
+      ;; If there is only one branch and we already in it
+      (and (= (count branches) 1 ) (= (git/git-branch-current repo) (first branches)))
+      (git/git-commit repo commit-name)
 
-(defn create-commit [state station-info]
-  (let [{:keys [head created-branches] :or {created-branches #{}}} state
-        {:keys [station line]} station-info
-        new-branches (clojure.set/difference (set line) created-branches)]
-    (create-new-branches new-branches)
+      ;; If there is only one branch and we are not in it
+      (= (count branches) 1)
+      (let [branch-name (first branches)
+            orphan (not (branch-exists? repo branch-name))]
+        (my-git-checkout repo branch-name orphan)
+        (git/git-commit repo commit-name)))
+    repo))
 
-    (assoc state
-     :created-branches (clojure.set/union created-branches new-branches)
-     :head (first line)
-    )
-  )) 
-
-(defn create-seq
-  [subway-seq]
-  (reduce
-   create-commit
-   {:created-branches #{}}
-   subway-seq
-   )
-  ) 
-
-(create-seq seqa) 
-
-;; TODO: Document this
-;; (defn build-repo
-;;   [path subway-seq]
-;;   ;; if folder already has git, load this repo, does not create it
-;;   (let [repo (git/git-init path)]
-;;     (map (partial create-git repo) subway-seq) 
-;;   )) 
+(defn build-git-operations
+  [subway-seq target-path]
+  (let [repo (git/git-init target-path)]
+    (reduce create-git-commands repo subway-seq)
+    repo))
 
 ;; if branch does not exist, create it
 ;; git checkout --orphan branch
@@ -48,16 +54,12 @@
 ;; if branch exists and you are not in it, checkout it
 ;; git checkout
 
-;; if branch is more than 1, create a merge commit
+;; if branches have the same sha, commit the first then git branch -f the second
 ;; git commit --allow-empty -m "Station"
+;; git branch -f yellow HEAD
 
-;; if branch is 1, create a simple commit
+;; if branch is more than 1, create a merge commit
 ;; git merge --no-ff --commit -m "Station" other
 
-;; (git/git-branch-list repo)
-;; (git/git-commit repo commit)
-
-;; git-branch-create
-;; git-commit
-;; git-merge
-;; git-checkout
+;; if branch is 1, create a simple commit
+;; git commit --allow-empty -m "Station"
