@@ -48,18 +48,8 @@
     (reduce create-git-commands repo subway-seq)
     repo))
 
-;; if branch does not exist, create it
-;; git checkout --orphan branch
-
-;; if branch exists and you are not in it, checkout it
-;; git checkout
-
-;; if branches have the same sha, commit the first then git branch -f the second
-;; git commit --allow-empty -m "Station"
-;; git branch -f yellow HEAD
-
-;; if branch is more than 1, create a merge commit
-;; git merge --no-ff --commit -m "Station" other
-
-;; if branch is 1, create a simple commit
-;; git commit --allow-empty -m "Station"
+;; get all the branches that are not pointing to the same SHA
+;; if branch is none, pick the first and create a commit
+;; if branch is only one, commit it
+;; if branch is more than 2, merge them
+;; get the remaining branches and git branch -f in them to the current HEAD
