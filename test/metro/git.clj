@@ -2,8 +2,7 @@
   (:require [metro.git :as sut]
             [me.raynes.fs :as file]
             [clojure.test :as t]
-            [clj-jgit.porcelain :as git]))
-
+            [clj-jgit.porcelain :as porcelain]))
 
 (def base-folder (str (.getParent (java.io.File. *file*)) "/test_repo/"))
 
@@ -19,13 +18,22 @@
 
     (t/is (= (sut/list-branches repo) '("Blue")))
 
-    (t/is (= (count (git/git-log repo)) 3))
+    (t/is (= (count (porcelain/git-log repo)) 3))
 
-    (t/is (= (map #(.getShortMessage %) (git/git-log repo)  '("C" "B" "A"))))))
+    (t/is (= (map #(.getShortMessage %) (porcelain/git-log repo)  '("C" "B" "A"))))))
 
 (def merge-g [{:name "Blue" :stations ["A" "B"]}
-              {:name "Red" :stations ["C" "B"]}])
+              {:name "Red" :stations ["C" "B"]}
+              {:name "Yellow" :stations ["D" "B"]}])
+
+
+(-> repo
+    (.merge)
+    ;; ^org.eclipse.jgit.api.MergeCommand (.include "Blue")
+    ;; ^org.eclipse.jgit.api.MergeCommand (.include "Red")
+    ^org.eclipse.jgit.api.MergeCommand (.setStrategy "ours")
+    (.call)) 
 
 (t/deftest merge-git-operations
   (let [repo (call-git-commands merge-g)]
-    (t/is (= (sut/list-branches repo) '("Blue" "Red")))))
+    (t/is (= (sut/list-branches repo) '("Blue" "Red" "Yellow")))))
