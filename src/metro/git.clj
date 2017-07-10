@@ -1,80 +1,88 @@
 (ns metro.git
-  (:require [metro.algorithm :as algo]
-            [metro.seq :as seq]
-            [clojure.string :as str]
-            [me.raynes.fs :as file]
-            [clj-jgit.porcelain :as porcelain]
-            [clj-jgit.querying :as querying])
-  (:import [org.eclipse.jgit.api Git InitCommand]))
+  (:require [clojure.string :as str]))
 
-(defn filter-branch-name
-  [branch]
-  (str/replace (.getName branch) #"refs/heads/" ""))
 
-(defn list-branches
-  [repo]
-  (map filter-branch-name (porcelain/git-branch-list repo)))
 
-(defn branch-exists?
-  [repo branch-name]
-  (some #(= % branch-name) (list-branches repo)))
+(defn git-checkout
+  [head repo]
+  (if (contains? (set (keys repo)) head)
+    (str "git checkout " head)
+    (str "git checkout --orphan " head)))
 
-(defn my-git-checkout
-  [^Git repo branch-name orphan]
-  (-> repo
-      (.checkout)
-      (.setName branch-name)
-      (.setOrphan orphan)
-      (.call)))
+(defn git-commit
+  [commit-name]
+  (str "git commit --allow-empty -m " commit-name))
 
-(defn branch-information
-  [repo]
-  (map
-   (fn [info]
-     {:name (filter-branch-name (first info))
-      :message (.getShortMessage (second info))})
-   (querying/branch-list-with-heads repo)))
+(defn git-force-branch
+  [branches]
+  (map (fn [branch] (str "git branch -f " branch " HEAD")) branches))
 
-(defn branches-with-same-commit?
-  [repo branches]
-  (let [commits (map :message 
-                     (filter #(contains? branches (:name %))
-                             (branch-information repo)))]
-    (not= (count (distinct commits)) (count commits))))
+(defn git-merge
+  [commit-name branches]
+  (str "git merge --strategy=ours --allow-unrelated-histories --no-ff --commit -m "
+       commit-name
+       " "
+       (str/join " " branches)))
 
-;; private
+(defn pick-head
+  [head repo branches]
+  (if (and
+       (contains? (set branches) head)
+       (contains? (set (keys repo)) head))
+    head
+    (first branches)))
+
+(defn find-divergent-branches
+  [head repo branches]
+  (let [station (get repo head)]
+    (filter 
+     (fn [branch]
+       (let [branch-station (get repo branch)]
+         (and
+          (not (nil? branch-station))
+          (not= branch-station station)
+          (not= branch head))))
+     branches)))
+
+(defn find-remaining-branches
+  [head merging-branches branches]
+  (->> (clojure.set/difference (set branches) (set merging-branches))
+       (remove #{head}))) 
+
+(defn update-repo
+  [repo branches commit-name]
+  (into repo (map (fn [branch] {branch commit-name}) branches)))
+
 (defn create-git-commands
   [state station]
   (let [commit-name (:station station)
-        branches (:line station)]
-    (cond
-      ;; If there is only one branch and we already in it
-      (and (= (count branches) 1 ) (= (porcelain/git-branch-current repo) (first branches)))
-      (porcelain/git-commit repo commit-name)
+        branches (:line station)
+        repo (:repo state)
+        head (:head state)
+        new-head (pick-head head repo branches)]
 
-      ;; If there is only one branch and we are not in it
-      (= (count branches) 1)
-      (let [branch-name (first branches)
-            orphan (not (branch-exists? repo branch-name))]
-        (my-git-checkout repo branch-name orphan)
-        (porcelain/git-commit repo commit-name))
+    ;; checkout to the branch
+    (if-not (= head new-head)
+      (println (git-checkout new-head repo)))
 
-      ;; (not= (branches-not-pointing? repo branches))
-      ;; (porcelain/git-merge repo )
+    ;; check if branch has more than one pointing to new-head
+    (let [merging-branches (find-divergent-branches new-head repo branches)
+          remaining-branches (find-remaining-branches new-head merging-branches branches)]
+      (if (> (count merging-branches) 1)
+          (println (git-merge commit-name merging-branches))
+          (println (git-commit commit-name)))
+      
 
-      )
+      (when (not-empty merging-branches)
+        (println (git-force-branch merging-branches)))
 
+      (when (not-empty remaining-branches)
+        (println (git-force-branch remaining-branches))))
 
-    repo))
+    (assoc state :head new-head :repo (update-repo repo branches commit-name))))
 
 (defn build-git-operations
   [subway-seq target-path]
-  (let [repo (porcelain/git-init target-path)]
-    (reduce create-git-commands repo subway-seq)
-    repo))
-
-;; get all the branches that are not pointing to the same SHA
-;; if branch is none, pick the first and create a commit
-;; if branch is only one, commit it
-;; if branch is more than 2, merge them
-;; get the remaining branches and git branch -f in them to the current HEAD
+  (let [initial-state {:repo {}}]
+    (reduce create-git-commands initial-state subway-seq)
+    {})) 
