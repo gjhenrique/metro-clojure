@@ -1,8 +1,6 @@
 (ns metro.git
   (:require [clojure.string :as str]))
 
-
-
 (defn git-checkout
   [head repo]
   (if (contains? (set (keys repo)) head)
@@ -11,7 +9,7 @@
 
 (defn git-commit
   [commit-name]
-  (str "git commit --allow-empty -m " commit-name))
+  (str "git commit --allow-empty -m \"" commit-name "\""))
 
 (defn git-force-branch
   [branches]
@@ -19,9 +17,9 @@
 
 (defn git-merge
   [commit-name branches]
-  (str "git merge --strategy=ours --allow-unrelated-histories --no-ff --commit -m "
+  (str "git merge --strategy=ours --allow-unrelated-histories --no-ff --commit -m \""
        commit-name
-       " "
+       "\" "
        (str/join " " branches)))
 
 (defn pick-head
@@ -35,7 +33,7 @@
 (defn find-divergent-branches
   [head repo branches]
   (let [station (get repo head)]
-    (filter 
+    (filter
      (fn [branch]
        (let [branch-station (get repo branch)]
          (and
@@ -68,21 +66,20 @@
     ;; check if branch has more than one pointing to new-head
     (let [merging-branches (find-divergent-branches new-head repo branches)
           remaining-branches (find-remaining-branches new-head merging-branches branches)]
-      (if (> (count merging-branches) 1)
+      (if (> (count merging-branches) 0)
           (println (git-merge commit-name merging-branches))
           (println (git-commit commit-name)))
-      
 
       (when (not-empty merging-branches)
-        (println (git-force-branch merging-branches)))
+        (run! println (git-force-branch merging-branches)))
 
       (when (not-empty remaining-branches)
-        (println (git-force-branch remaining-branches))))
+        (run! println (git-force-branch remaining-branches))))
 
     (assoc state :head new-head :repo (update-repo repo branches commit-name))))
 
 (defn build-git-operations
-  [subway-seq target-path]
+  [subway-seq]
   (let [initial-state {:repo {}}]
     (reduce create-git-commands initial-state subway-seq)
-    {})) 
+    {}))

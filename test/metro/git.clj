@@ -5,7 +5,7 @@
 
 
 (defn call-git-commands [metro-seq]
-  (build-git-operations (metro.seq/seq-graph metro-seq) base-folder))
+  (build-git-operations (metro.seq/seq-graph metro-seq)))
 
 (def linear-g [{:name "Blue" :stations ["A" "B" "C"]}])
 
@@ -19,3 +19,8 @@
 (t/deftest merge-git-operations
   (let [repo (call-git-commands merge-g)]))
 
+(def existing-g [{:name "Red" :stations ["C" "B"]}
+                 {:name "Yellow" :stations ["B" "D"]}])
+
+(t/deftest merge-git-operations
+  (let [repo (call-git-commands existing-g)]))
