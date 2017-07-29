@@ -5,22 +5,41 @@
 
 
 (defn call-git-commands [metro-seq]
-  (build-git-operations (metro.seq/seq-graph metro-seq)))
+  (let [commands (atom [])]
+    (sut/build-git-operations
+     (metro.seq/seq-graph metro-seq)
+     (fn [command] (swap! commands conj command)))
+    (deref commands)))
 
 (def linear-g [{:name "Blue" :stations ["A" "B" "C"]}])
 
 (t/deftest simple-git-operations
-  (let [repo (call-git-commands linear-g) ]))
+  (let [commands (call-git-commands linear-g)]
+    (t/is (= commands ["git checkout --orphan Blue"
+                       (git-commit "A")
+                       (git-commit "B")
+                       (git-commit "C")]))))
 
 (def merge-g [{:name "Blue" :stations ["A" "B"]}
-              {:name "Red" :stations ["C" "B"]}
-              {:name "Yellow" :stations ["D" "B"]}])
+              {:name "Red" :stations ["C" "B"]}])
 
 (t/deftest merge-git-operations
-  (let [repo (call-git-commands merge-g)]))
+  (let [commands (call-git-commands merge-g)]
+    (t/is (= commands ["git checkout --orphan Red"
+                       (git-commit "C")
+                       "git checkout --orphan Blue"
+                       (git-commit "A")
+                       (git-merge "B" '("Red"))
+                       "git branch -f Red HEAD"]))))
 
 (def existing-g [{:name "Red" :stations ["C" "B"]}
                  {:name "Yellow" :stations ["B" "D"]}])
 
 (t/deftest merge-git-operations
-  (let [repo (call-git-commands existing-g)]))
+  (let [commands (call-git-commands existing-g)]
+    (t/is (= commands ["git checkout --orphan Red"
+                       (git-commit "C")
+                       (git-commit "B")
+                       "git branch -f Yellow HEAD"
+                       "git checkout Yellow"
+                       (git-commit "D")]))))

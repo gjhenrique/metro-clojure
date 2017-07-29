@@ -2,10 +2,10 @@
   (:require [clojure.string :as str]))
 
 (defn git-checkout
-  [head repo]
-  (if (contains? (set (keys repo)) head)
-    (str "git checkout " head)
-    (str "git checkout --orphan " head)))
+  [branch repo]
+  (if (contains? (set (keys repo)) branch)
+    (str "git checkout " branch)
+    (str "git checkout --orphan " branch)))
 
 (defn git-commit
   [commit-name]
@@ -57,29 +57,30 @@
         branches (:line station)
         repo (:repo state)
         head (:head state)
+        observer (:observer state)
         new-head (pick-head head repo branches)]
 
     ;; checkout to the branch
     (if-not (= head new-head)
-      (println (git-checkout new-head repo)))
+      (observer (git-checkout new-head repo)))
 
     ;; check if branch has more than one pointing to new-head
     (let [merging-branches (find-divergent-branches new-head repo branches)
           remaining-branches (find-remaining-branches new-head merging-branches branches)]
       (if (> (count merging-branches) 0)
-          (println (git-merge commit-name merging-branches))
-          (println (git-commit commit-name)))
+          (observer (git-merge commit-name merging-branches))
+          (observer (git-commit commit-name)))
 
       (when (not-empty merging-branches)
-        (run! println (git-force-branch merging-branches)))
+        (run! observer (git-force-branch merging-branches)))
 
       (when (not-empty remaining-branches)
-        (run! println (git-force-branch remaining-branches))))
+        (run! observer (git-force-branch remaining-branches))))
 
     (assoc state :head new-head :repo (update-repo repo branches commit-name))))
 
 (defn build-git-operations
-  [subway-seq]
-  (let [initial-state {:repo {}}]
+  [subway-seq observer]
+  (let [initial-state {:repo {} :observer observer}]
     (reduce create-git-commands initial-state subway-seq)
     {}))
