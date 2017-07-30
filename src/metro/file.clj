@@ -6,6 +6,10 @@
 
 (def regex-line-separator #"\*")
 
+(defn print-chart
+  [graph]
+  (loom.io/view graph))
+
 (defn file-contents
   [file-name]
   (-> (io/resource (str file-name ".txt"))
