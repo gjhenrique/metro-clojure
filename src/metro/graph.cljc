@@ -1,12 +1,6 @@
 (ns metro.graph
   (:require [loom.graph :as graph]
-            [loom.io :as io]
-            [loom.attr :as attr])
-  (:gen-class))
-
-(defn print-chart
-  [graph]
-  (io/view graph))
+            [loom.attr :as attr]))
 
 (defn lines-inside
   [station subway-info]
