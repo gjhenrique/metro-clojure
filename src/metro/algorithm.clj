@@ -1,6 +1,5 @@
 (ns metro.algorithm
-  (:require [loom.alg :as alg]
-            [loom.graph :as graph]
+  (:require [loom.graph :as graph]
             [loom.attr :as attr]
             [metro.graph :as g]))
 
