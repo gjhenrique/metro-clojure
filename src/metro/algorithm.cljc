@@ -1,7 +1,6 @@
 (ns metro.algorithm
   (:require [loom.graph :as graph]
-            [loom.attr :as attr]
-            [metro.graph :as g]))
+            [loom.attr :as attr]))
 
 (defn visited?
   [g node]
@@ -62,6 +61,6 @@
 
 (defn initial-subway-graph
   [config]
-  (let [graph (g/build-subway-graph config)]
+  (let [graph (metro.graph/build-subway-graph config)]
     (assoc (random-initial-station graph) :graph graph)))
 
