@@ -18,7 +18,7 @@
                  [com.cemerick/piggieback "0.2.1"]
                  [weasel "0.7.0"]
 
-                 [cljsjs/d3 "4.3.0-5"]])
+                 [cljsjs/cytoscape "3.1.4-0"]])
 
 (require '[clojure.java.io :as io]
          '[metro.file]
