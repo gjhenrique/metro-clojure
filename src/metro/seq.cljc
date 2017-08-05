@@ -15,10 +15,6 @@
 
   (seq [self] self))
 
-
-(defmethod print-method MetroGraph [o, ^java.io.Writer w]
-  (.write w (str (:current-node (.state o)))))
-
 (defn seq-graph
   [config]
   (-> config
