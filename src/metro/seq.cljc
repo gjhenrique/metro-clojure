@@ -18,9 +18,16 @@
   ISeqable
   (-seq [self] self))
 
-(defn seq-graph
+(defn seq-config
   [config]
   (-> config
+      (metro.algorithm/initial-subway-config)
+      (metro.algorithm/traverse-subway-graph)
+      (MetroGraph.)))
+
+(defn seq-graph
+  [graph]
+  (-> graph
       (metro.algorithm/initial-subway-graph)
       (metro.algorithm/traverse-subway-graph)
       (MetroGraph.)))

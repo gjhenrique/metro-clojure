@@ -13,7 +13,7 @@
      (t/is (= (:current-node state) (:node value)))
      (t/is (= (:current-line state) (:line value)))
      (traverse-subway-graph state))
-   (traverse-subway-graph (initial-subway-graph params))
+   (traverse-subway-graph (initial-subway-config params))
    expected-values))
 
 (defn test-traversal

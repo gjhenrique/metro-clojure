@@ -5,7 +5,7 @@
 (def config [{:name "Blue" :stations ["A" "B" "C"]}
              {:name "Red" :stations ["D" "B" "E"]}])
 
-(def g (sut/seq-graph config))
+(def g (sut/seq-config config))
 
 (t/deftest count-seq
   (t/is (= (count g) 5)))

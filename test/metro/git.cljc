@@ -7,7 +7,7 @@
 (defn call-git-commands [metro-seq]
   (let [commands (atom [])]
     (sut/build-git-operations
-     (metro.seq/seq-graph metro-seq)
+     (metro.seq/seq-config metro-seq)
      (fn [command] (swap! commands conj command)))
     (deref commands)))
 

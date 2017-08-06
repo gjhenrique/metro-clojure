@@ -54,8 +54,11 @@
              :current-line (metro.graph/lines graph current-node)
              :graph (attr/add-attr graph current-node :visited true)))))
 
-(defn initial-subway-graph
+(defn initial-subway-config
   [config]
   (let [graph (metro.graph/build-subway-graph config)]
     (assoc (random-initial-station graph) :graph graph)))
 
+(defn initial-subway-graph
+  [graph]
+  (assoc (random-initial-station graph) :graph graph))
