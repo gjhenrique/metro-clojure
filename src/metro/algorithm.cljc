@@ -17,16 +17,11 @@
   (filter (fn [s] (not (visited? g s)))
           (graph/successors g node)))
 
-;; TODO: Move this to graph file
-(defn lines
-  [g node]
-  (attr/attr g node :lines))
-
 (defn random-initial-station
   "Pick a random station to begin the algorithm"
   [g]
   (let [node (first (graph/nodes g))]
-    {:pending-nodes () :current-node node :current-line (lines g node)}))
+    {:pending-nodes () :current-node node :current-line (metro.graph/lines g node)}))
 
 (defn traverse-subway-graph
   [state]
@@ -45,7 +40,7 @@
 
       (and (empty? successors) (empty? pending-nodes))
       (assoc state
-             :current-line (lines graph current-node)
+             :current-line (metro.graph/lines graph current-node)
              :graph (attr/add-attr graph current-node :visited true)
              :end true)
 
@@ -56,7 +51,7 @@
 
       :else
       (assoc state
-             :current-line (lines graph current-node)
+             :current-line (metro.graph/lines graph current-node)
              :graph (attr/add-attr graph current-node :visited true)))))
 
 (defn initial-subway-graph

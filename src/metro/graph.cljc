@@ -24,6 +24,14 @@
    graph
    (all-stations subway-info)))
 
+(defn lines
+  [graph node]
+  (attr/attr graph node :lines))
+
+(defn stations
+  [graph]
+  (loom.graph/nodes graph))
+
 (defn build-raw-graph
   [subway-info]
   (apply graph/digraph (map
