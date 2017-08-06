@@ -7,8 +7,8 @@
 
 (enable-console-print!)
 
-(def config [{:name "Blue" :stations ["A" "B" "G"]}
-             {:name "Green" :stations ["D" "B" "F" "H"]}
+(def config [{:name "Blue" :stations ["Sé" "Liberdade" "São Joaquim"]}
+             {:name "Green" :stations ["Sé" "A" "F" "H"]}
              {:name "Red" :stations ["C" "B" "E" "H"]}])
 
 (def g (metro.graph/build-subway-graph config))
@@ -35,8 +35,9 @@
                                         {:selector ".Green" :style {"background-color" "green"}}
                                         {:selector ".Red.Blue" :style {"background-color" "#101"}}
                                         {:selector ".Red.Blue.Green" :style {"background-color" "orange"}}
-                                        {:selector ".highlighted" :style {"background-color" "olive" "line-color" "olive"
-                                                                          "target-arrow-color" "olive"
+                                        {:selector ".highlighted" :style {"border-color" "#87CEFA" "border-width" "10"
+                                                                          "line-color" "#87CEFA"
+                                                                          "target-arrow-color" "#87CEFA"
                                                                           "transition-property" "background-color, line-color, target-arrow-color"
                                                                           "transition-duration" "0.5s"}}]})))
 
