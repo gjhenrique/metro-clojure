@@ -20,7 +20,7 @@
                     :classes (clojure.string/join " " (metro.graph/lines graph n))})
            (metro.graph/stations graph))
    :edges (map (fn [e] {:data {:id (clojure.string/join e) :source (first e) :target (second e)}})
-               (loom.graph/edges graph))})
+               (metro.graph/connections graph))})
 
 (def cy (js/cytoscape (clj->js {:container (.getElementById js/document "graph")
                                 :elements (graph-attrs g)

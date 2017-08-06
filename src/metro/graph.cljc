@@ -32,6 +32,18 @@
   [graph]
   (loom.graph/nodes graph))
 
+(defn connections
+  [graph]
+  (loom.graph/edges graph))
+
+(defn predecessors
+  [graph node]
+  (graph/predecessors graph station))
+
+(defn successors
+  [graph node]
+  (graph/successors graph station))
+
 (defn build-raw-graph
   [subway-info]
   (apply graph/digraph (map

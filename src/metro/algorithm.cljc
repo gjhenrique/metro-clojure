@@ -1,6 +1,7 @@
 (ns metro.algorithm
   (:require [loom.graph :as graph]
-            [loom.attr :as attr]))
+            [loom.attr :as attr]
+            [metro.graph]))
 
 (defn visited?
   [g node]
@@ -10,12 +11,12 @@
   [g node]
   (first (filter
           (fn [p] (not (visited? g p)))
-          (graph/predecessors g node))))
+          (metro.graph/predecessors g node))))
 
 (defn find-successors
   [g node]
   (filter (fn [s] (not (visited? g s)))
-          (graph/successors g node)))
+          (metro.graph/successors g node)))
 
 (defn random-initial-station
   "Pick a random station to begin the algorithm"
