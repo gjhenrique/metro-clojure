@@ -1,6 +1,5 @@
 (ns metro.animations
-  (:require [metro.algorithm]
-            [metro.graph]
+  (:require [metro.graph]
             [metro.seq]
             [clojure.string]
             [cljsjs.cytoscape]))
@@ -34,6 +33,7 @@
                                         {:selector ".Red" :style {"background-color" "red"}}
                                         {:selector ".Green" :style {"background-color" "green"}}
                                         {:selector ".Red.Blue" :style {"background-color" "#101"}}
+                                        {:selector ".Red.Green" :style {"background-color" "#101"}}
                                         {:selector ".Red.Blue.Green" :style {"background-color" "orange"}}
                                         {:selector ".highlighted" :style {"border-color" "#87CEFA" "border-width" "10"
                                                                           "line-color" "#87CEFA"
@@ -41,16 +41,38 @@
                                                                           "transition-property" "background-color, line-color, target-arrow-color"
                                                                           "transition-duration" "0.5s"}}]})))
 
+(defn find-element
+  [cy id]
+  (.getElementById cy id))
+
+(defn find-predecessor-edges
+  [cy graph station]
+  (let [preds (metro.graph/predecessors graph station)]
+    (when preds
+      (map #(find-element cy (str % station)) preds))))
+
+(defn cy-nodes-and-edges
+  [cy stations-seq graph]
+  (remove nil?
+          ;; flattening only one level
+          (apply concat
+                 (map (fn [station]
+                        [(find-predecessor-edges cy graph (:station station))
+                         [(find-element cy (:station station))]])
+                      stations-seq))))
+
 (defn search-algorithm
-  [cy seqa config]
-  (if (empty? seqa)
+  [cy original-seq algorithm-seq]
+  (if (empty? algorithm-seq)
 
     (do
       (.removeClass (.nodes cy) "highlighted")
-      (js/setTimeout #(search-algorithm cy (metro.seq/seq-graph config) config) 1000))
+      (.removeClass (.edges cy) "highlighted")
+      (js/setTimeout #(search-algorithm cy original-seq original-seq) 500))
 
     (do
-      (.addClass (.getElementById cy (:station (first seqa))) "highlighted")
-      (js/setTimeout #(search-algorithm cy (rest seqa) config) 1000))))
+      (run! #(.addClass % "highlighted") (first algorithm-seq))
+      (js/setTimeout #(search-algorithm cy original-seq (rest algorithm-seq)) 500))))
 
-(search-algorithm cy (metro.seq/seq-graph config) config)
+(let [nodes-edges (cy-nodes-and-edges cy (metro.seq/seq-graph g) g)]
+  (search-algorithm cy nodes-edges nodes-edges))
