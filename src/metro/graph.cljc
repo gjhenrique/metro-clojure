@@ -37,11 +37,11 @@
   (loom.graph/edges graph))
 
 (defn predecessors
-  [graph node]
+  [graph station]
   (graph/predecessors graph station))
 
 (defn successors
-  [graph node]
+  [graph station]
   (graph/successors graph station))
 
 (defn build-raw-graph
