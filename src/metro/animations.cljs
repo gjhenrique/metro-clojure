@@ -27,8 +27,8 @@
                         :style {"border-color" "#87CEFA" "border-width" "10"
                                 "line-color" "#87CEFA"
                                 "target-arrow-color" "#87CEFA"
-                                "transition-property" "background-color, line-color, target-arrow-color"
-                                "transition-duration" "0.5s"}})
+                                "transition-property" "border-color, line-color, target-arrow-color"
+                                "transition-duration" "500"}})
 (defn graph-attrs
   [graph]
   {:nodes (map
