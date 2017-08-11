@@ -2,7 +2,7 @@
  :source-paths #{"src"}
  :resource-paths #{"res"}
  :dependencies '[[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.9.495" :scope "test"]
+                 [org.clojure/clojurescript "1.9.854" :scope "test"]
 
                  [aysylu/loom "1.0.0"]
                  [org.clojure/data.json "0.2.6"]
@@ -40,6 +40,14 @@
    (cljs-repl)
    (cljs)
    (target :dir #{"target"})))
+
+(deftask prod
+  []
+  (comp
+   (cljs :optimizations :advanced
+         :source-map true
+         :compiler-options {:externs ["src/metro/cytoscape_externs.js"]})
+   (target :dir #{"prod"})))
 
 (deftask raw-file-to-json
   [c city CITY str "The city with the subways"]
