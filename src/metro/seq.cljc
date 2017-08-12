@@ -1,22 +1,44 @@
 (ns metro.seq
   (:require [metro.algorithm]))
 
-;; TODO: Make clj and cljs work from here
-(deftype MetroGraph [state]
-  ISeq
-  (-first [self] {:station (:current-node state)
-                 :line (:current-line state)})
-  (-rest [self]
-    (or (next self) '()))
+#?(:clj
+   (deftype MetroGraph [state]
+     clojure.lang.ISeq
+     (first [self] (seq-first state))
 
-  INext
-  (-next [self]
-      (let [new-state (metro.algorithm/traverse-subway-graph state)]
-        (when-not (nil? new-state)
-          (MetroGraph. new-state))))
+     (more [self] (seq-rest self))
 
-  ISeqable
-  (-seq [self] self))
+     (next [self] (seq-next state))
+
+     (seq [self] self)))
+
+#?(:cljs
+   (deftype MetroGraph [state]
+     ISeq
+     (-first [self] (seq-first state))
+
+     (-rest [self] (seq-rest self))
+
+     INext
+     (-next [self] (seq-next state))
+
+     ISeqable
+     (-seq [self] self)))
+
+(defn seq-first
+  [state]
+  {:station (:current-node state)
+   :line (:current-line state)})
+
+(defn seq-rest
+  [self]
+  (or (next self) '()))
+
+(defn seq-next
+  [state]
+  (let [new-state (metro.algorithm/traverse-subway-graph state)]
+    (when-not (nil? new-state)
+      (MetroGraph. new-state))))
 
 (defn seq-config
   [config]
@@ -31,3 +53,6 @@
       (metro.algorithm/initial-subway-graph)
       (metro.algorithm/traverse-subway-graph)
       (MetroGraph.)))
+
+
+

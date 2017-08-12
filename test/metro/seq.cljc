@@ -14,7 +14,6 @@
   (t/is (= (:station (first g)) "A"))
   (t/is (= (:line (first g)) '("Blue"))))
 
-
 (t/deftest map-seq
   (t/is (= (map :station g) '("A" "D" "B" "E" "C"))))
 
