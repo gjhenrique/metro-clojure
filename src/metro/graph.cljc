@@ -30,11 +30,11 @@
 
 (defn stations
   [graph]
-  (loom.graph/nodes graph))
+  (graph/nodes graph))
 
 (defn connections
   [graph]
-  (loom.graph/edges graph))
+  (graph/edges graph))
 
 (defn predecessors
   [graph station]
