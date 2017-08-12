@@ -52,35 +52,40 @@
   (into repo (map (fn [branch] {branch commit-name}) branches)))
 
 (defn create-git-commands
-  [state station]
-  (let [commit-name (:station station)
-        branches (:line station)
-        repo (:repo state)
+  [state commit-name branches]
+  (let [repo (or (:repo state) {})
         head (:head state)
-        observer (:observer state)
+        commands (atom [])
         new-head (pick-head head repo branches)]
 
     ;; checkout to the branch
     (if-not (= head new-head)
-      (observer (git-checkout new-head repo)))
+      (swap! commands conj (git-checkout new-head repo)))
 
     ;; check if branch has more than one pointing to new-head
     (let [merging-branches (find-divergent-branches new-head repo branches)
           remaining-branches (find-remaining-branches new-head merging-branches branches)]
       (if (> (count merging-branches) 0)
-          (observer (git-merge commit-name merging-branches))
-          (observer (git-commit commit-name)))
+        (swap! commands conj (git-merge commit-name merging-branches))
+        (swap! commands conj (git-commit commit-name)))
 
-      (when (not-empty merging-branches)
-        (run! observer (git-force-branch merging-branches)))
+      (let [not-head-branches (concat merging-branches remaining-branches)]
+        (swap! commands conj (git-force-branch not-head-branches))))
 
-      (when (not-empty remaining-branches)
-        (run! observer (git-force-branch remaining-branches))))
+    (assoc state :commands (flatten (deref commands))
+           :head new-head
+           :repo (update-repo repo branches commit-name))))
 
-    (assoc state :head new-head :repo (update-repo repo branches commit-name))))
-
-(defn build-git-operations
-  [subway-seq observer]
-  (let [initial-state {:repo {} :observer observer}]
-    (reduce create-git-commands initial-state subway-seq)
-    {}))
+(defn git-commands
+  [stations]
+  (let [commands (atom [])]
+    (reduce
+     (fn [state station-info]
+       (let [new-state (create-git-commands state
+                                            (:station station-info)
+                                            (:line station-info))]
+         (swap! commands conj (:commands new-state))
+         new-state))
+     {}
+     stations)
+    (deref commands)))
