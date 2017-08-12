@@ -1,5 +1,6 @@
 (ns metro.seq
   (:require [metro.seq :as sut]
+            [metro.git :as git]
             [clojure.test :as t]))
 
 (def config [{:name "Blue" :stations ["A" "B" "C"]}
@@ -19,8 +20,9 @@
 
 (t/deftest filter-seq
   (t/is
-   (= (filter #(> (count (:line %)) 1) g)
-      [{:station "B" :line '("Blue" "Red")}])))
+   (= (count (filter #(> (count (:line %)) 1) g)) 1))
+
+  (t/is (= (map :station (filter #(> (count (:line %)) 1) g)) '("B"))))
 
 (t/deftest reverse-seq
   (t/is
@@ -33,3 +35,9 @@
    (=
     (reduce str (map :station g))
     "ADBEC")))
+
+(t/deftest test-commands
+  (t/is
+   (= (:commands (first g) )
+    ['"git checkout --orphan Blue"
+     (git/git-commit "A")])))
