@@ -1,6 +1,8 @@
 (ns metro.seq
   (:require [metro.algorithm]))
 
+(declare seq-first seq-rest seq-next)
+
 #?(:clj
    (deftype MetroGraph [state]
      clojure.lang.ISeq
