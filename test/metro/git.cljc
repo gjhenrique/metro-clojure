@@ -9,7 +9,7 @@
 
 (t/deftest simple-git-operations
   (let [commands (sut/git-commands linear-g)]
-    (t/is (= commands [["git checkout --orphan Blue"
+    (t/is (= commands [["git checkout --orphan \"Blue\""
                         (git-commit "A")]
 
                        [(git-commit "B")]
@@ -21,12 +21,12 @@
 
 (t/deftest merge-git-operations
   (let [commands (sut/git-commands merge-g) ]
-    (t/is (= commands [["git checkout --orphan Red"
+    (t/is (= commands [["git checkout --orphan \"Red\""
                        (git-commit "C")]
-                       ["git checkout --orphan Blue"
+                       ["git checkout --orphan \"Blue\""
                        (git-commit "A")]
                        [(git-merge "B" '("Red"))
-                       "git branch -f Red HEAD"]]))))
+                       "git branch -f \"Red\" HEAD"]]))))
 
 (def existing-g [{:station "C" :line '("Red")}
                  {:station "B" :line '("Yellow" "Red")}
@@ -34,9 +34,9 @@
 
 (t/deftest existing-git-operations
   (let [commands (sut/git-commands existing-g)]
-    (t/is (= commands [["git checkout --orphan Red"
+    (t/is (= commands [["git checkout --orphan \"Red\""
                         (git-commit "C")]
                        [(git-commit "B")
-                        "git branch -f Yellow HEAD"]
-                       ["git checkout Yellow"
+                        "git branch -f \"Yellow\" HEAD"]
+                       ["git checkout \"Yellow\""
                         (git-commit "D")]])))) 

@@ -5,8 +5,8 @@
 (defn git-checkout
   [branch repo]
   (if (contains? (set (keys repo)) branch)
-    (str "git checkout " branch)
-    (str "git checkout --orphan " branch)))
+    (str "git checkout \"" branch "\"")
+    (str "git checkout --orphan \"" branch "\"")))
 
 (defn git-commit
   [commit-name]
@@ -14,7 +14,7 @@
 
 (defn git-force-branch
   [branches]
-  (map (fn [branch] (str "git branch -f " branch " HEAD")) branches))
+  (map (fn [branch] (str "git branch -f \"" branch "\" HEAD")) branches))
 
 (defn git-merge
   [commit-name branches]

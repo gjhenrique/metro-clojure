@@ -39,5 +39,5 @@
 (t/deftest test-commands
   (t/is
    (= (:commands (first g) )
-    ['"git checkout --orphan Blue"
+    ['"git checkout --orphan \"Blue\""
      (git/git-commit "A")])))
