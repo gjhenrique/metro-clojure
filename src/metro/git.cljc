@@ -1,5 +1,6 @@
 (ns metro.git
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [clojure.set :as set]))
 
 (defn git-checkout
   [branch repo]
@@ -44,7 +45,7 @@
 
 (defn find-remaining-branches
   [head merging-branches branches]
-  (->> (clojure.set/difference (set branches) (set merging-branches))
+  (->> (set/difference (set branches) (set merging-branches))
        (remove #{head}))) 
 
 (defn update-repo
@@ -52,7 +53,10 @@
   (into repo (map (fn [branch] {branch commit-name}) branches)))
 
 (defn create-git-commands
-  [state commit-name branches]
+  ([commit-name branches]
+   (create-git-commands {} commit-name branches))
+
+  ([state commit-name branches]
   (let [repo (or (:repo state) {})
         head (:head state)
         commands (atom [])
@@ -74,7 +78,7 @@
 
     (assoc state :commands (flatten (deref commands))
            :head new-head
-           :repo (update-repo repo branches commit-name))))
+           :repo (update-repo repo branches commit-name)))))
 
 (defn git-commands
   [stations]

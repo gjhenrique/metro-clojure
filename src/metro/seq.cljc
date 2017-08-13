@@ -16,7 +16,7 @@
      (seq [self] self)))
 
 #?(:cljs
-   (deftype Metro [algorithm-state git-state]
+   (deftype MetroGraph [algorithm-state git-state]
      ISeq
      (-first [self] (seq-first algorithm-state git-state))
 
@@ -53,8 +53,7 @@
                           (initial-subway-fn)
                           (metro.algorithm/traverse-subway-graph))]
     (MetroGraph. initial-state
-                 (metro.git/create-git-commands {}
-                                                (:current-node initial-state)
+                 (metro.git/create-git-commands (:current-node initial-state)
                                                 (:current-line initial-state)))))
 
 (defn seq-config
@@ -63,4 +62,4 @@
 
 (defn seq-graph
   [graph]
-  (build-seq config metro.algorithm/initial-subway-graph))
+  (build-seq graph metro.algorithm/initial-subway-graph))

@@ -61,14 +61,22 @@
           ;; flattening only one level
           (apply concat
                  (map (fn [station]
-                        [(find-predecessor-edges cy graph (:station station))
-                         [(find-element cy (:station station))]])
+                        [
+                         {
+                          :type :edge
+                          :elems (find-predecessor-edges cy graph (:station station))
+                          }
+
+                         {
+                          :type :node
+                          :elems (find-element cy (:station station))
+                          :git-commands (:commands station)
+                          }])
                       stations-seq))))
 
 (defn iterate-animation
   [cy original-seq algorithm-seq]
   (if (empty? algorithm-seq)
-
     (do
       (.batch cy (fn []
                    (.removeClass (.nodes cy) "highlighted")
@@ -77,11 +85,19 @@
       (js/setTimeout #(iterate-animation cy original-seq original-seq) 500))
 
     (do
-      (run! #(.addClass % "highlighted") (first algorithm-seq))
+      (let [element (first algorithm-seq)]
+        (if (= (:type element) :node)
+            (do
+              (.log js/console (clj->js (:git-commands element)))
+              (.addClass (:elems element) "highlighted"))
+
+            (run! #(.addClass % "highlighted") (:elems element))))
+
       (js/setTimeout #(iterate-animation cy original-seq (rest algorithm-seq)) 500))))
 
 (defn ^:export start-animation
   [container config]
+  (println (metro.graph/build-subway-graph (js->clj config :keywordize-keys true)))
   (let [graph (metro.graph/build-subway-graph (js->clj config :keywordize-keys true))
         metro-seq (metro.seq/seq-graph graph)
         cy (create-cy container graph)
