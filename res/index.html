@@ -5,17 +5,37 @@
   </head>
   <body>
     <style>
-      #graph {
+      .graph {
        width: 500px;
        height: 500px;
+       display: inline-block;
+     }
+
+     .git-container {
+       display: inline-block;
+     }
+
+     .animation {
        display: block;
      }
     </style>
-    <div id="graph"></div>
+    <div class="animation">
+      <div id="graph1" class="graph"></div>
+      <div id="git-operations" class="git-container"></div>
+    </div>
+
+
+    <div class="animation">
+      <div id="graph2" class="graph"></div>
+    </div>
+
     <script src="main.js"></script>
     <script>
-     var config = [{name: "Red", stations: ["A", "B", "C"]}]
-     metro.animations.start_animation("graph", config)
+     var config = [{name: "Red", stations: ["A", "B", "C"]}];
+     var containers = {graph_container: "graph1", git_container: "git-operations"};
+     metro.animations.start_animation(containers, config)
+
+     metro.animations.start_animation({graph_container: "graph2"}, config)
     </script>
   </body>
 </html>

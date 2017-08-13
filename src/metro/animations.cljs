@@ -37,16 +37,16 @@
    :edges (map (fn [e] {:data {:id (clojure.string/join e) :source (first e) :target (second e)}})
                (metro.graph/connections graph))})
 
+(defn find-element
+  [container id]
+  (.getElementById container id))
+
 (defn create-cy
   [container graph]
-  (js/cytoscape (clj->js {:container (.getElementById js/document container)
+  (js/cytoscape (clj->js {:container (find-element js/document container)
                           :elements (graph-attrs graph)
                           :layout graph-layout
                           :style (concat [node-style edge-style highlighted-style] colors-style) })))
-
-(defn find-element
-  [cy id]
-  (.getElementById cy id))
 
 (defn find-predecessor-edges
   [cy graph station]
@@ -71,35 +71,56 @@
                           :type :node
                           :elems (find-element cy (:station station))
                           :git-commands (:commands station)
-                          }])
+                          }
+                         ])
                       stations-seq))))
 
+(defn add-git-commands
+  [git-container git-commands]
+  (let [fragment (.createDocumentFragment js/document)]
+    (run! (fn [command]
+           (let [element (.createElement js/document "div")]
+             (set! (. element -innerHTML) command)
+             (.appendChild fragment element)))
+          git-commands)
+    (.appendChild git-container fragment)))
+
+(defn remove-git-commands
+  [git-container]
+  (set! (. git-container -innerHTML) ""))
+
 (defn iterate-animation
-  [cy original-seq algorithm-seq]
+  [cy git-container original-seq algorithm-seq]
   (if (empty? algorithm-seq)
     (do
+      (when git-container
+        (remove-git-commands git-container))
+
       (.batch cy (fn []
                    (.removeClass (.nodes cy) "highlighted")
                    (.removeClass (.edges cy) "highlighted")))
 
-      (js/setTimeout #(iterate-animation cy original-seq original-seq) 500))
+      (js/setTimeout #(iterate-animation cy git-container original-seq original-seq) 500))
 
     (do
       (let [element (first algorithm-seq)]
         (if (= (:type element) :node)
             (do
-              (.log js/console (clj->js (:git-commands element)))
+              (when git-container
+                (add-git-commands git-container
+                                 (:git-commands element)))
+
               (.addClass (:elems element) "highlighted"))
 
             (run! #(.addClass % "highlighted") (:elems element))))
 
-      (js/setTimeout #(iterate-animation cy original-seq (rest algorithm-seq)) 500))))
+      (js/setTimeout #(iterate-animation cy git-container original-seq (rest algorithm-seq)) 500))))
 
 (defn ^:export start-animation
-  [container config]
-  (println (metro.graph/build-subway-graph (js->clj config :keywordize-keys true)))
-  (let [graph (metro.graph/build-subway-graph (js->clj config :keywordize-keys true))
+  [containers config]
+  (let [{graph-container :graph_container, git-container :git_container} (js->clj containers :keywordize-keys true)
+        graph (metro.graph/build-subway-graph (js->clj config :keywordize-keys true))
         metro-seq (metro.seq/seq-graph graph)
-        cy (create-cy container graph)
+        cy (create-cy graph-container graph)
         nodes-edges (cy-nodes-and-edges cy metro-seq graph)]
-    (iterate-animation cy nodes-edges nodes-edges)))
+    (iterate-animation cy (find-element js/document git-container) nodes-edges nodes-edges)))
