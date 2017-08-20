@@ -22,6 +22,7 @@
 
 (require '[clojure.java.io :as io]
          '[metro.file]
+         '[metro.seq]
          '[clojure.data.json :as json]
          '[tolitius.boot-check :as check]
 
@@ -56,6 +57,15 @@
       (.write w (json/json-str
                  (metro.file/format-stations city))))
     fileset))
+
+(deftask generate-git-commands
+  [c city CITY str "The city with the subways"
+   f file FILE str "File to be written"]
+  (->>
+   (metro.file/read-json-file (str "res/" city ".json"))
+   (metro.seq/seq-config)
+   (metro.file/git-commands)
+   (spit file)))
 
 (deftask check-sources []
   (set-env! :source-paths #{"src"})

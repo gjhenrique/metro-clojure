@@ -32,6 +32,18 @@
         stations (second line-info)]
     (assoc {} :name (str/replace name regex-line-separator "") :stations stations)))
 
+(defn git-commands
+  [metro-seq]
+  (str/join "\n"
+            (mapcat
+             (fn [station-info]
+               (flatten [(str "# " (:station station-info)
+                              " "
+                              (str/join " " (:line station-info)))
+                         (:commands station-info)
+                         ]))
+             metro-seq)))
+
 ;; TODO: put functions under the methods
 (defn format-stations
   [file-name]
