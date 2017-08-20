@@ -39,16 +39,16 @@
                                     :current-node (first successors)
                                     :pending-nodes (concat pending-nodes (rest successors))))
 
+      (and (visited? graph current-node) (empty? successors))
+      (traverse-subway-graph (assoc state
+                                    :current-node (first pending-nodes)
+                                    :pending-nodes (rest pending-nodes)))
+
       (and (empty? successors) (empty? pending-nodes))
       (assoc state
              :current-line (metro.graph/lines graph current-node)
              :graph (attr/add-attr graph current-node :visited true)
              :end true)
-
-      (and (visited? graph current-node) (empty? successors))
-      (traverse-subway-graph (assoc state
-                                    :current-node (first pending-nodes)
-                                    :pending-nodes (rest pending-nodes)))
 
       :else
       (assoc state
