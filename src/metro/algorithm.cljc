@@ -52,6 +52,7 @@
 
       :else
       (assoc state
+             :pending-nodes (remove #{current-node} pending-nodes)
              :current-line (metro.graph/lines graph current-node)
              :graph (attr/add-attr graph current-node :visited true)))))
 
