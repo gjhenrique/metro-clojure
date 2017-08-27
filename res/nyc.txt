@@ -37,7 +37,6 @@ Chambers Street / West Broadway
 Cortlandt Street / West Broadway TEMPORARILY CLOSED
 Rector Street
 *2
-Stations /  Cross Streets
 Wakefield-241 Street / White Plains Road
 Nereid Avenue White Plains Road
 233 Street / White Plains Road
@@ -196,47 +195,6 @@ Baychester Avenue / Tillotson Avenue
 Gun Hill Road / Seymour Avenue
 Pelham Parkway / Williamsbridge Road
 Morris Park / Esplanade
-BRONX -North of East 180 St to Nereid Av
-Nereid Av White Plains Rd
-233 Street / White Plains Road
-225 Street / White Plains Road
-219 Street / White Plains Road
-Gun Hill Road / White Plains Road
-Burke Avenue / White Plains Road
-Allerton Avenue White Plains Road
-Pelham Parkway / White Plains Road
-Bronx Park East / White Plains Road
-East 180 Street / Morris Park Avenue
-West Farms Square- E Tremont Avenue / Boston Road-Bronx Zoo
-174 Street / Southern Boulevard
-Freeman Street / Southern Boulevard
-Simpson Street / Westchester Avenue
-Intervale Avenue / Westchester Avenue
-Prospect Avenue / Westchester Avenue
-Jackson Avenue / Westchester Avenue
-3 Avenue-149 Street
-149 Street- Grand Concourse
-138 Street / Grand Concourse
-125 Street / Lexington Avenue
-86 Street / Lexington Avenue
-59 Street / Lexington Avenue
-Grand Central-42 Street / Lexington Avenue
-14 Street - Union Square/ 4 Avenue
-Brooklyn Bridge-City Hall / Centre Street
-Fulton Street / Broadway
-Wall Street / Broadway
-Bowling Green / Broadway
-Borough Hall / Court Street &   (Northbound only)
-Nevins Street / Flatbush Avenue
-Atlantic Avenue / Barclays Center
-Franklin Avenue / Eastern Parkway
-President Street / Nostrand Avenue
-Sterling Street / Nostrand Avenue
-Winthrop Street / Nostrand Avenue
-Church Avenue / Nostrand Avenue
-Beverly Road / Nostrand Avenue
-Newkirk Avenue / Nostrand Avenue
-Flatbush Avenue-Brooklyn College/ Nostrand Avenue
 *6
 Pelham Bay Park / Bruckner Expressway
 Buhre Avenue / Westchester Avenue
@@ -346,31 +304,6 @@ Grant Avenue / Pitkin Avenue
 80 Street / Liberty Avenue
 88 Street / Liberty Avenue
 Rockaway Boulevard / Liberty Avenue
-Ozone Park - Lefferts Boulevard Branch
-Rockaway Boulevard / Liberty Avenue
-104 Street / Liberty Avenue
-111 Street / Liberty Avenue
-Ozone Park-Lefferts Boulevard / Liberty Avenue
-Bus and Rail Connections
-Far Rockaway - Mott Avenue Branch
-Rockaway Boulevard / Liberty Avenue
-Aqueduct Racetrack
-Aqueduct-North Conduit Avenue
-Howard Beach-JFK Airport / 159 Avenue
-Broad Channel
-Beach 67 Street / Rockaway Freeway
-Beach 60 Street / Rockaway Freeway
-Beach 44 Street / Rockaway Freeway
-Beach 36 Street / Rockaway Freeway
-Beach 25 Street / Rockaway Freeway
-Far Rockaway-Mott Avenue
-Rockaway Park Branch - Rush Hour Service Only Peak Direction Only - 6:30am to 8am and 5:15pm to 6:45pm
-Shuttle Service All Times Between Broad Channel and Rockaway Park / Beach 116 St
-Broad Channel
-Beach 90 Street / Rockaway Freeway
-Beach 98 Street / Rockaway Freeway
-Beach 105 Street / Rockaway Freeway
-Rockaway Park / Beach 116 Street
 *B
 Bedford Park Boulevard / Grand Concourse
 Kingsbridge Road / Grand Concourse
@@ -525,7 +458,6 @@ Spring Street / 6 Avenue
 Canal Street / 6 Avenue
 World Trade Center / Church Street Elevator not in service due to long-term construction. Click here for details.
 *F
-Stations /  Cross Streets
 Jamaica-179 Street / Hillside Avenue
 169 Street / Hillside Avenue
 Parsons Boulevard / Hillside Avenue
@@ -722,7 +654,6 @@ Avenue U / West 7 Street Beginning 5 AM Monday, July 31, 2017 Coney Island-bound
 86 Street / West 7 Street Beginning 5 AM Monday, July 31, 2017 Coney Island-bound   trains will not stop at this station. Read more
 Coney Island - Stillwell/ Surf Avenue
 *Q
-Stations /  Cross Streets
 96 Street / 2 Avenue
 86 Street / 2 Avenue
 72 Street / 2 Avenue
@@ -757,7 +688,6 @@ Ocean Parkway/ Brighton Beach Avenue
 West 8 Street-New York Aquarium/ Surf Avenue
 Coney Island-Stillwell Avenue/ Surf Avenue
 *R
-Stations /  Cross Streets
 Forest Hills-71 Avenue / Queens Boulevard
 67 Avenue / Queens Boulevard
 63 Drive / Rego Park / Queens Boulevard
@@ -803,19 +733,6 @@ Bay Ridge Avenue / 4 Avenue
 Bay Ridge-95 Street / 4 Avenue
 *S
 42 Street Shuttle 
-42 Street-Times Square / Broadway-7 Avenue
-42 St-Grand Central / Park Avenue
-Franklin Avenue Shuttle
-Franklin Avenue Fulton Street
-Park Place Franklin Avenue Classon Avenue
-Botanic Garden Eastern Parkway Franklin Avenue
-Prospect Park Empire Boulevard Flatbush Avenue
-Rockaway Park Shuttle
-Broad Channel
-Beach 90 Street Rockaway Freeway
-Beach 98 Street Rockaway Freeway
-Beach 105 Street Rockaway Freeway
-Rockaway Park- Beach 116 Street
 *W
 Astoria-Ditmars Boulevard / 31 Street
 Astoria Boulevard / 31 Street

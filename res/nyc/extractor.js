@@ -1,7 +1,9 @@
 const fs = require('fs');
 const cheerio = require('cheerio');
 
-const BLACKLIST = ['Subway Transfers', 'Stations / Cross Streets', 'BRONX', 'MANHATTAN', 'QUEENS', 'BROOKLYN'];
+const BLACKLIST = ['Subway Transfers', 'Stations / Cross Streets',
+                   'BRONX', 'MANHATTAN', 'QUEENS', 'BROOKLYN',
+                   'Stations /  Cross Streets'];
 
 const findStations = (fileName) => {
   const file = `${__dirname}/${fileName}.htm`;
@@ -9,7 +11,7 @@ const findStations = (fileName) => {
   const contents = fs.readFileSync(file, 'utf-8');
 
   var $ = cheerio.load(contents);
-  const table = $(`table[summary='Table of ${fileName} Subway Line Stops']`);
+  const table = $(`table[summary='Table of ${fileName} Subway Line Stops']`).first();
 
   return table.find('.emphasized').parent().map((i, elem) => {
     return $(elem) .text().split('\n')
@@ -35,7 +37,6 @@ const allStations = (dirName) => {
     .map((line) => { return {line: line, stations: findStations(line)} });
 }
 
-// console.log(findStations(1));
 const stations = allStations(__dirname)
       .map((line) => [`*${line.line}`, ...line.stations]);
 // Flattenig and joining with a breakline
