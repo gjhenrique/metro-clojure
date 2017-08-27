@@ -1,10 +1,15 @@
 (ns metro.file
   (:require [clojure.java.io :as io]
             [clojure.string :as str]
-            [clojure.data.json :as json])
+            [clojure.data.json :as json]
+            [loom.io])
   (:gen-class))
 
 (def regex-line-separator #"\*")
+
+(defn print-chart
+  [graph]
+  (loom.io/view graph))
 
 (defn file-contents
   [file-name]
