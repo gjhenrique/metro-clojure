@@ -67,6 +67,15 @@
    (metro.file/git-commands)
    (spit file)))
 
+(deftask view-graph
+  [c city CITY str "The city with the subways"]
+  (comp
+    (->>
+     (metro.file/read-json-file (str "res/" city ".json"))
+     (metro.graph/build-subway-graph)
+     (metro.file/print-chart))
+    (Thread/sleep 10)))
+
 (deftask check-sources []
   (set-env! :source-paths #{"src"})
   (comp
@@ -75,4 +84,4 @@
     (check/with-kibit)
     (check/with-bikeshed)))
 
-(boot.core/load-data-readers!) 
+(boot.core/load-data-readers!)
