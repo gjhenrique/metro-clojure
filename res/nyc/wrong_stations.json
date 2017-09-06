@@ -1,0 +1,86 @@
+[
+  {
+    "right": "135 Street Saint Nicholas Avenue",
+    "wrong": ["135 Street / Saint Nicholas Avenue"]
+  },
+  {
+    "right": "63 Drive - Rego Park / Queens Boulevard",
+    "wrong": ["63 Drive / Rego Park / Queens Boulevard","63 Dr - Rego Park / Queens Boulevard"]
+  },
+  {
+    "right": "135 Street Saint Nicholas Avenue",
+    "wrong": ["135 Street / Saint Nicholas Avenue"]
+  },
+  {
+    "right": "75 Street / Jamaica Avenue",
+    "wrong": ["75 Street - Elderts  Lane / Jamaica Avenue"]
+  },
+  {
+    "right": "Atlantic Avenue / Barclays Center",
+    "wrong": ["Atlantic Avenue / Barclays Center / 4 Avenue", "Atlantic Avenue / Barclays Center / Brooklyn Academy of Music"]
+  },
+  {
+    "right": "Broadway Junction",
+    "wrong": ["Broadway Junction \\(East New York\\) / Fulton Street",
+              "Broadway Junction \\(East New York\\) Fulton Street",
+              "Broadway Junction \\(Fulton Street\\)",
+              "Broadway Junction \\(Eastern Parkway\\)"]
+  },
+  {
+    "right": "Coney Island - Stillwell Avenue / Surf Avenue",
+    "wrong": ["Coney Island - Stillwell / Surf Avenue"]
+  },
+  {
+    "right": "Cortlandt Street / Church Street",
+    "wrong": ["Cortlandt Street Church Street"]
+  },
+  {
+    "right": "Court Sq",
+    "wrong": ["Court Sq - 23 Street / 44 Drive"]
+  },
+
+  {
+    "right": "Court Street - Borough Hall / Montague Street",
+    "wrong": ["Court Street / Montague Street"]
+  },
+
+  {
+    "right": "Court Street - Borough Hall / Montague Street",
+    "wrong": ["Court Street / Montague Street"]
+  },
+  {
+    "right": "Grand Avenue - Newtown / Queens Boulevard",
+    "wrong": ["Grand Avenue / Newton / Queens Boulevard", "Grand Avenue / Newtown / Queens Boulevard"]
+  },
+  {
+    "right": "Fulton Street / Broadway",
+    "wrong": ["Fulton Street / Broadway / Nassau   Street / William St" ,
+              "Fulton Street / Broadway / Nassau   Street / William   St" ,
+              "Fulton Street / William   St" ,
+              "Fulton Street / Nassau Street"]
+  },
+  {
+    "right": "High Street / Cadman Plaza East",
+    "wrong": ["High Street / Brooklyn Bridge / Cadman Plaza East"]
+  },
+  {
+    "right": "Hoyt Street - Fulton Mall",
+    "wrong": ["Hoyt Street / Fulton Mall"]
+  },
+  {
+    "right": "Jamaica Center - Parsons / Archer",
+    "wrong": ["Jamaica Center - Parsons / Archer Archer Avenue"]
+  },
+  {
+    "right": "Sutphin Boulevard / Archer Avenue - JFK Airport",
+    "wrong": ["Sutphin Boulevard / Archer Avenue / JFK Airport"]
+  },
+  {
+    "right": "Times Square - 42 Street / 7 Avenue - Broadway",
+    "wrong": ["Times Square - 42 Street / 7 Avenue - Broadway except", "Times Square - 42 Street / Broadway", "Times Square - 42 Street / Broadway / 7 Avenue"]
+  },
+  {
+    "right": "West 4 Street - Washington Square / 6 Avenue",
+    "wrong": ["West 4 Street / 6 Avenue", "West 4 Street / Washington Square / 6 Avenue"]
+  }
+]
