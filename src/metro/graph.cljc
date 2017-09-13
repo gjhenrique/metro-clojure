@@ -2,21 +2,6 @@
   (:require [loom.graph :as graph]
             [loom.attr :as attr]))
 
-(defn lines-inside
-  [station subway-info]
-  (map :name
-       (filter
-        (fn [line]
-          (some #(= station %) (:stations line)))
-        subway-info)))
-
-;; TODO: Check if remove this?
-(defn all-stations
-  [subway-info]
-  (set
-   (flatten
-    (map :stations subway-info))))
-
 (defn lines
   [graph node]
   (attr/attr graph node :lines))
@@ -24,19 +9,6 @@
 (defn stations
   [graph]
   (graph/nodes graph))
-
-(defn build-attributes
-  [graph subway-info]
-  (reduce
-   (fn [g station]
-     (println station)
-     (let [lines (lines-inside station subway-info)]
-       (println lines)
-       (if lines
-         (attr/add-attr g station :lines lines)
-         g)))
-   graph
-   (all-stations subway-info)))
 
 (defn connections
   [graph]
@@ -50,81 +22,57 @@
   [graph station]
   (graph/successors graph station))
 
-(defn remove-connection
-  [station-graph station-connection]
-  (let [fn-with-element (fn [connection] (not= connection station-connection))
-        first-elements (take-while fn-with-element station-graph)
-        last-elements (rest (drop-while fn-with-element station-graph))]
-    ;; Check if element is not first or last one
-    (if (or (empty? first-elements) (empty? last-elements))
-      (concat first-elements last-elements)
-      (concat (butlast first-elements)
-              [[(first (last first-elements)) (ffirst last-elements)]]
-              last-elements))))
+(defn connections-without-cycle
+  [graph stations]
+  (loop [g graph 
+         final-stations [(first stations)]
+         iter-stations (rest stations)]
 
-(defn graph-without-cycle
-  [graph station-graph]
-  (reduce
-   (fn [g station-connection]
-     (let [new-graph (graph/digraph g station-connection)]
-       (if (loom.alg/dag? new-graph)
-         (do
-           ;; (println (str "Its dag " (first station-connection) "   -   " (second station-connection)))
-           new-graph
-           )
-         (do 
-           (println (str "Removing " (first station-connection) "  -  " (second station-connection)))
-           (reduced (graph-without-cycle graph (remove-connection station-graph station-connection))))
-         )))
-   graph
-   station-graph))
+    (if (empty? iter-stations)
+      (partition 2 1 final-stations)
 
-(defn build-raw-nodes
-  [subway-info]
-  (map #(partition 2 1 (:stations %)) subway-info))
-   ;; #(apply graph/digraph (partition 2 1 (:stations %)))
+      (let [new-graph (graph/digraph g [(last final-stations) (first iter-stations)])]
+        (if (loom.alg/dag? new-graph)
+          (recur new-graph
+                 (conj final-stations (first iter-stations))
+                 (rest iter-stations))
 
-;; (DEFN build-raw-graph
-;;   [subway-info]
-;;   (apply graph/digraph (map
-;;                         #(apply graph/digraph (partition 2 1 (:stations %)))
-;;                         subway-info)))
+          (do
+            (println (str "Removing station " [(last final-stations) (first iter-stations)]))
+            (recur graph final-stations (rest iter-stations))))))))
 
-(defn reverse-graph
-  [graph-info]
+(defn reverse-stations
+  [connections]
   (map 
    (fn [info] [(second info) (first info)])
-   (reverse graph-info)))
+   (reverse connections)))
 
-(defn build-raw-graph
-  [subway-info]
-  (let [graph-info (build-raw-nodes subway-info)]
-    (reduce
-     (fn [graph station-graph]
-       (let [new-graph (apply graph/digraph graph station-graph)]
-         (if (loom.alg/dag? new-graph)
-           (do
-             (println (str "Dag!"))
-             new-graph)
-           (do
-             (let [b (apply graph/digraph graph (reverse-graph station-graph))]
-               (if (loom.alg/dag? b)
-                 (do
-                   (println "Yes. Dag")
-                   b)
-                 (do
-                   (println "Not Dag")
-                   (graph-without-cycle graph station-graph)
-                   )))))))
-     (apply graph/digraph (first graph-info))
-     (rest graph-info))))
+(defn build-attributes
+  [graph connections line]
+  (reduce
+   (fn [g station] (attr/add-attr g station :lines line))
+   graph
+   (set (flatten connections))))
 
+(defn build-graph
+  [graph connections]
+  (let [new-graph (apply graph/digraph graph connections)]
+    (when (loom.alg/dag? new-graph) connections)))
+  
+(defn valid-connection
+  [graph subway-info]
+  (let [connections (partition 2 1 (:stations subway-info))]
+    (or (build-graph graph connections)
+        (build-graph graph (reverse-stations connections))
+        (connections-without-cycle graph (:stations subway-info)))))
 
 (defn build-subway-graph
   [subway-info]
-  (-> subway-info
-      (build-raw-graph)
-      (loom.alg/dag?)
-      (println)
-      ;; (build-attributes subway-info)))
-      ))
+  (reduce
+   (fn [graph station-info]
+     (let [connections (valid-connection graph station-info)
+           new-graph (apply graph/digraph graph connections)]
+        (build-attributes new-graph connections (:name station-info))))
+     ;; Empty graph
+     (graph/digraph)
+     subway-info))

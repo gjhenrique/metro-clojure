@@ -25,6 +25,4 @@
  
 (t/deftest remove-connection-if-needed
   (let [g (sut/build-subway-graph cycle-config)]
-    ;; (println (sut/connections g))
-    (println (sut/connections g))
     (t/is (loom.alg/dag? g))))
