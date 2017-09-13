@@ -32,8 +32,6 @@
                        {:node "A" :line '("Blue")}
                        {:node "B" :line '("Blue" "Red")}])
 
-
-
 (t/deftest merge-traverse
   (test-traversal merge-g expected-merge-g))
 

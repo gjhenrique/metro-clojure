@@ -50,7 +50,10 @@
 (defn build-attributes
   [graph connections line]
   (reduce
-   (fn [g station] (attr/add-attr g station :lines line))
+   (fn [g station]
+     (attr/add-attr g station :lines
+                    (conj (or (attr/attr g station :lines) [])
+                          line)))
    graph
    (set (flatten connections))))
 

@@ -19,9 +19,16 @@
     (t/is (= (set [["A" "B"] ["B" "C"]]) (set (sut/connections g))))))
 
 
+(def attr-config [{:name "Blue" :stations ["A" "B"]}
+                  {:name "Red" :stations ["A" "B"]}])
+
+(t/deftest test-attribute
+  (let [g (sut/build-subway-graph attr-config)]
+    (t/is (= (loom.attr/attr g "B" :lines) ["Blue" "Red"]))
+    (t/is (= (loom.attr/attr g "A" :lines) ["Blue" "Red"]))))
+
 (def cycle-config [{:name "Blue" :stations ["A" "B" "C"]}
                    {:name "Red" :stations ["C" "A" "B"]}])
-                   ;; {:name "Yellow" :stations ["B" "E" "D"]}])
  
 (t/deftest remove-connection-if-needed
   (let [g (sut/build-subway-graph cycle-config)]
