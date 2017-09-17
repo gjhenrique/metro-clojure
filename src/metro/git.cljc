@@ -46,7 +46,7 @@
 (defn find-remaining-branches
   [head merging-branches branches]
   (->> (set/difference (set branches) (set merging-branches))
-       (remove #{head}))) 
+       (remove #{head})))
 
 (defn update-repo
   [repo branches commit-name]

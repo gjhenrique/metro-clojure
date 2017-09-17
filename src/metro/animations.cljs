@@ -62,7 +62,7 @@
           (apply concat
                  (map (fn [station]
                         [{:type :edge
-                          :elems (find-predecessor-edges cy graph (:station station))} 
+                          :elems (find-predecessor-edges cy graph (:station station))}
                          {:type :node
                           :elems (find-element cy (:station station))
                           :git-commands (:commands station)}])

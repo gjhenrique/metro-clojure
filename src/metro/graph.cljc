@@ -26,7 +26,7 @@
 (defn- connections-without-cycle
   [graph stations line-name]
   (println (format "[%s] We have to remove some nodes. =(" line-name))
-  (loop [g graph 
+  (loop [g graph
          final-stations [(first stations)]
          iteration-stations (rest stations)]
 
@@ -45,7 +45,7 @@
 
 (defn- reverse-stations
   [connections]
-  (map 
+  (map
    (fn [info] [(second info) (first info)])
    (reverse connections)))
 
