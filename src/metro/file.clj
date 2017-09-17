@@ -45,8 +45,7 @@
                (flatten [(str "# " (:station station-info)
                               " "
                               (str/join " " (:line station-info)))
-                         (:commands station-info)
-                         ]))
+                         (:commands station-info)]))
              metro-seq)))
 
 (defn format-stations
