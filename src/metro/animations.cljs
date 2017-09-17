@@ -28,7 +28,7 @@
                                 "line-color" "#87CEFA"
                                 "target-arrow-color" "#87CEFA"
                                 "transition-duration" "500"}})
-(defn graph-attrs
+(defn- graph-attrs
   [graph]
   {:nodes (map
            (fn [n] {:data {:id n}
@@ -37,59 +37,52 @@
    :edges (map (fn [e] {:data {:id (clojure.string/join e) :source (first e) :target (second e)}})
                (metro.graph/connections graph))})
 
-(defn find-element
+(defn- find-element
   [container id]
   (.getElementById container id))
 
-(defn create-cy
+(defn- create-cy
   [container graph]
   (js/cytoscape (clj->js {:container (find-element js/document container)
                           :elements (graph-attrs graph)
                           :layout graph-layout
                           :style (concat [node-style edge-style highlighted-style] colors-style) })))
 
-(defn find-predecessor-edges
+(defn- find-predecessor-edges
   [cy graph station]
   (let [preds (metro.graph/predecessors graph station)]
     (when preds
       (map #(find-element cy (str % station)) preds))))
 
-(defn cy-nodes-and-edges
+(defn- cy-nodes-and-edges
   [cy stations-seq graph]
   ;; Removing nodes that don't have successors
   (remove nil?
           ;; flattening only one level
           (apply concat
                  (map (fn [station]
-                        [
-                         {
-                          :type :edge
-                          :elems (find-predecessor-edges cy graph (:station station))
-                          }
-
-                         {
-                          :type :node
+                        [{:type :edge
+                          :elems (find-predecessor-edges cy graph (:station station))} 
+                         {:type :node
                           :elems (find-element cy (:station station))
-                          :git-commands (:commands station)
-                          }
-                         ])
+                          :git-commands (:commands station)}])
                       stations-seq))))
 
-(defn add-git-commands
+(defn- add-git-commands
   [git-container git-commands]
   (let [fragment (.createDocumentFragment js/document)]
     (run! (fn [command]
-           (let [element (.createElement js/document "div")]
-             (set! (. element -innerHTML) command)
-             (.appendChild fragment element)))
+            (let [element (.createElement js/document "div")]
+              (set! (. element -innerHTML) command)
+              (.appendChild fragment element)))
           git-commands)
     (.appendChild git-container fragment)))
 
-(defn remove-git-commands
+(defn- remove-git-commands
   [git-container]
   (set! (. git-container -innerHTML) ""))
 
-(defn iterate-animation
+(defn- iterate-animation
   [cy git-container original-seq algorithm-seq]
   (if (empty? algorithm-seq)
     (do
@@ -105,14 +98,14 @@
     (do
       (let [element (first algorithm-seq)]
         (if (= (:type element) :node)
-            (do
-              (when git-container
-                (add-git-commands git-container
-                                 (:git-commands element)))
+          (do
+            (when git-container
+              (add-git-commands git-container
+                                (:git-commands element)))
 
-              (.addClass (:elems element) "highlighted"))
+            (.addClass (:elems element) "highlighted"))
 
-            (run! #(.addClass % "highlighted") (:elems element))))
+          (run! #(.addClass % "highlighted") (:elems element))))
 
       (js/setTimeout #(iterate-animation cy git-container original-seq (rest algorithm-seq)) 500))))
 

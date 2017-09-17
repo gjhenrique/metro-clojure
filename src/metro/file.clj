@@ -7,16 +7,9 @@
 
 (def regex-line-separator #"\*")
 
-(defn print-chart
+(defn create-image
   [graph]
   (loom.io/view graph))
-
-(defn file-contents
-  [file-name]
-  (-> (io/resource (str file-name ".txt"))
-      (io/file)
-      (slurp)
-      (str/split-lines)))
 
 (defn read-json-file
   [file-name]
@@ -24,14 +17,21 @@
                       (io/file)
                       (slurp))))
 
-(defn loop-lines
+(defn- file-contents
+  [file-name]
+  (-> (io/resource (str file-name ".txt"))
+      (io/file)
+      (slurp)
+      (str/split-lines)))
+
+(defn- loop-lines
   [file-name]
   (partition 2
              (partition-by
-                #(re-find (re-pattern (str regex-line-separator #"\w*")) %)
-                (file-contents file-name))))
+              #(re-find (re-pattern (str regex-line-separator #"\w*")) %)
+              (file-contents file-name))))
 
-(defn filter-stations
+(defn- filter-stations
   [line-info]
   (let [name (ffirst line-info)
         stations (second line-info)]
@@ -49,7 +49,6 @@
                          ]))
              metro-seq)))
 
-;; TODO: put functions under the methods
 (defn format-stations
   [file-name]
   (map

@@ -3,26 +3,27 @@
             [loom.attr :as attr]
             [metro.graph]))
 
-(defn visited?
-  [g node]
-  (attr/attr g node :visited))
+(defn- visited?
+  [graph node]
+  (attr/attr graph node :visited))
 
-(defn find-predecessor
-  [g node]
+(defn- find-predecessor
+  [graph node]
   (first (filter
-          (fn [p] (not (visited? g p)))
-          (metro.graph/predecessors g node))))
+          (fn [p] (not (visited? graph p)))
+          (metro.graph/predecessors graph node))))
 
-(defn find-successors
-  [g node]
-  (filter (fn [s] (not (visited? g s)))
-          (metro.graph/successors g node)))
+(defn- find-successors
+  [graph node]
+  (filter
+   (fn [s] (not (visited? graph s)))
+          (metro.graph/successors graph node)))
 
-(defn random-initial-station
+(defn- random-initial-station
   "Pick a random station to begin the algorithm"
-  [g]
-  (let [node (first (graph/nodes g))]
-    {:pending-nodes () :current-node node :current-line (metro.graph/lines g node)}))
+  [graph]
+  (let [node (first (graph/nodes graph))]
+    {:pending-nodes () :current-node node :current-line (metro.graph/lines graph node)}))
 
 (defn traverse-subway-graph
   [state]
@@ -31,6 +32,7 @@
         successors (find-successors graph current-node)]
     (cond
       end nil
+
       (and (not (nil? predecessor)))
       (traverse-subway-graph (assoc state :current-node predecessor))
 

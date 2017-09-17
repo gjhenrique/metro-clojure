@@ -73,7 +73,8 @@
     (->>
      (metro.file/read-json-file (str "res/" city ".json"))
      (metro.graph/build-subway-graph)
-     (metro.file/print-chart))
+     (metro.file/create-image))
+    ;; Argh. This is ugly
     (Thread/sleep 10)))
 
 (deftask check-sources []

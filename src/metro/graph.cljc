@@ -1,6 +1,7 @@
 (ns metro.graph
   (:require [loom.graph :as graph]
-            [loom.attr :as attr]))
+            [loom.attr :as attr]
+            [loom.alg :as alg]))
 
 (defn lines
   [graph node]
@@ -22,32 +23,33 @@
   [graph station]
   (graph/successors graph station))
 
-(defn connections-without-cycle
-  [graph stations]
+(defn- connections-without-cycle
+  [graph stations line-name]
+  (println (format "[%s] We have to remove some nodes. =(" line-name))
   (loop [g graph 
          final-stations [(first stations)]
-         iter-stations (rest stations)]
+         iteration-stations (rest stations)]
 
-    (if (empty? iter-stations)
+    (if (empty? iteration-stations)
       (partition 2 1 final-stations)
 
-      (let [new-graph (graph/digraph g [(last final-stations) (first iter-stations)])]
-        (if (loom.alg/dag? new-graph)
+      (let [new-graph (graph/digraph g [(last final-stations) (first iteration-stations)])]
+        (if (alg/dag? new-graph)
           (recur new-graph
-                 (conj final-stations (first iter-stations))
-                 (rest iter-stations))
+                 (conj final-stations (first iteration-stations))
+                 (rest iteration-stations))
 
           (do
-            (println (str "Removing station " [(last final-stations) (first iter-stations)]))
-            (recur graph final-stations (rest iter-stations))))))))
+            (println (str "Removing station " [(last final-stations) (first iteration-stations)]))
+            (recur graph final-stations (rest iteration-stations))))))))
 
-(defn reverse-stations
+(defn- reverse-stations
   [connections]
   (map 
    (fn [info] [(second info) (first info)])
    (reverse connections)))
 
-(defn build-attributes
+(defn- add-attributes
   [graph connections line]
   (reduce
    (fn [g station]
@@ -57,25 +59,27 @@
    graph
    (set (flatten connections))))
 
-(defn build-graph
-  [graph connections]
+(defn- add-connections
+  [graph connections line-name description]
+  (println (format "[%s] Trying %s" line-name description))
   (let [new-graph (apply graph/digraph graph connections)]
-    (when (loom.alg/dag? new-graph) connections)))
-  
-(defn valid-connection
-  [graph subway-info]
-  (let [connections (partition 2 1 (:stations subway-info))]
-    (or (build-graph graph connections)
-        (build-graph graph (reverse-stations connections))
-        (connections-without-cycle graph (:stations subway-info)))))
+    (when (alg/dag? new-graph) connections)))
+
+(defn- valid-connection
+  [graph line-config]
+  (let [line-name (:name line-config)
+        connections (partition 2 1 (:stations line-config))]
+    (or (add-connections graph connections line-name "Normal")
+        (add-connections graph (reverse-stations connections) line-name "Reversed")
+        (connections-without-cycle graph (:stations line-config) line-name))))
 
 (defn build-subway-graph
-  [subway-info]
+  [subway-config]
   (reduce
-   (fn [graph station-info]
-     (let [connections (valid-connection graph station-info)
+   (fn [graph line-config]
+     (let [connections (valid-connection graph line-config)
            new-graph (apply graph/digraph graph connections)]
-        (build-attributes new-graph connections (:name station-info))))
-     ;; Empty graph
-     (graph/digraph)
-     subway-info))
+       (add-attributes new-graph connections (:name line-config))))
+   ;; Empty graph
+   (graph/digraph)
+   subway-config))
