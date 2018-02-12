@@ -72,7 +72,7 @@
   [git-container git-commands]
   (let [fragment (.createDocumentFragment js/document)]
     (run! (fn [command]
-            (let [element (.createElement js/document "div")]
+            (let [element (.createElement js/document "span")]
               (set! (. element -innerHTML) command)
               (.appendChild fragment element)))
           git-commands)
@@ -82,38 +82,50 @@
   [git-container]
   (set! (. git-container -innerHTML) ""))
 
-(defn- iterate-animation
-  [cy git-container original-seq algorithm-seq]
-  (if (empty? algorithm-seq)
+
+(defn- ^:export stop-animation
+  [state]
+  (js/clearTimeout (:timeout-id @state)))
+
+;; this method is too big. sorry ='|
+(defn- ^:export start-animation
+  [state]
+  (if (empty? (:algorithm-seq @state))
     (do
-      (when git-container
-        (remove-git-commands git-container))
+      (.batch (:cy @state) (fn []
+                             (.removeClass (.nodes (:cy @state)) "highlighted")
+                             (.removeClass (.edges (:cy @state)) "highlighted")))
 
-      (.batch cy (fn []
-                   (.removeClass (.nodes cy) "highlighted")
-                   (.removeClass (.edges cy) "highlighted")))
-
-      (js/setTimeout #(iterate-animation cy git-container original-seq original-seq) 500))
+      (swap! state assoc :algorithm-seq (:original-seq @state))
+      (swap! state assoc :timeout-id (js/setTimeout #(start-animation state)
+                                                    (:timeout @state))))
 
     (do
-      (let [element (first algorithm-seq)]
+      (let [element (first (:algorithm-seq @state))]
         (if (= (:type element) :node)
           (do
-            (when git-container
-              (add-git-commands git-container
+            (when (:git-container @state)
+              (remove-git-commands (:git-container @state))
+              (add-git-commands (:git-container @state)
                                 (:git-commands element)))
 
-            (.addClass (:elems element) "highlighted"))
+              (.addClass (:elems element) "highlighted"))
 
           (run! #(.addClass % "highlighted") (:elems element))))
 
-      (js/setTimeout #(iterate-animation cy git-container original-seq (rest algorithm-seq)) 500))))
+      (swap! state assoc :algorithm-seq (rest (:algorithm-seq @state)))
+      (swap! state assoc :timeout-id (js/setTimeout #(start-animation state)
+                                                    (:timeout @state))))))
 
-(defn ^:export start-animation
+(defn ^:export build-animation
   [containers config]
-  (let [{graph-container :graph_container, git-container :git_container} (js->clj containers :keywordize-keys true)
+  (let [{graph-container :graph_container timeout :timeout git-container :git_container} (js->clj containers :keywordize-keys true)
         graph (metro.graph/build-subway-graph (js->clj config :keywordize-keys true))
         metro-seq (metro.seq/seq-graph graph)
         cy (create-cy graph-container graph)
         nodes-edges (cy-nodes-and-edges cy metro-seq graph)]
-    (iterate-animation cy (find-element js/document git-container) nodes-edges nodes-edges)))
+    (atom {:cy cy
+           :git-container (find-element js/document git-container)
+           :original-seq nodes-edges
+           :timeout (or timeout 500)
+           :algorithm-seq nodes-edges})))
