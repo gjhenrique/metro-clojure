@@ -1,6 +1,6 @@
 (ns metro.algorithm
   (:require  [clojure.test :as t]
-             [metro.graph :refer [build-subway-graph]]
+             [metro.graph :refer [build-optimized-graph]]
              [loom.attr :as attr]))
 
 (def linear-g [{:name "Blue" :stations ["A" "B" "C"]}])
@@ -23,8 +23,6 @@
 
 (t/deftest initial-simple-traverse
   (test-traversal linear-g expected-linear-g))
-
-
 
 (def merge-g [{:name "Blue" :stations ["A" "B"]}
               {:name "Red" :stations ["C" "B"]}])

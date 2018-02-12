@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
   <head>
+    <meta charset="UTF-8" />
     <title>Hello, World!</title>
   </head>
   <body>
@@ -19,11 +20,11 @@
        display: block;
      }
     </style>
+    <h1 id="vixi">Ola</h1>
     <div class="animation">
       <div id="graph1" class="graph"></div>
       <div id="git-operations" class="git-container"></div>
     </div>
-
 
     <div class="animation">
       <div id="graph2" class="graph"></div>
@@ -31,11 +32,28 @@
 
     <script src="main.js"></script>
     <script>
-     var config = [{name: "Red", stations: ["A", "B", "C"]}];
-     var containers = {graph_container: "graph1", git_container: "git-operations"};
-     metro.animations.start_animation(containers, config)
+     var config = [{name: "Red", stations: ["A", "C", "B"]},
+                   {name: "Blue", stations: ["C", "B", "A"]}];
 
-     metro.animations.start_animation({graph_container: "graph2"}, config)
+      var config = [{name: "Red", stations: ["A", "B", "C"]},
+                   {name: "Blue", stations: ["C", "A", "B"]}];
+     var containers = {graph_container: "graph1", git_container: false};
+     /* var a = metro.animations.build_raw_animation(containers, config);*/
+     var a = metro.animations.build_animation(containers, config);
+     /* metro.animations.start_animation(a);*/
+
+     var b = true;
+     document.getElementById("vixi").addEventListener("click", function( event ) {
+       if (b) {
+         /* metro.animations.stop_animation(a);*/
+         b = false
+       }
+       else {
+         /* metro.animations.start_animation(a);*/
+         b = true;
+       }
+     }, false);
+     /* metro.animations.start_animation({graph_container: "graph2"}, config)*/
     </script>
   </body>
 </html>

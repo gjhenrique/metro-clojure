@@ -72,7 +72,7 @@
   (comp
     (->>
      (metro.file/read-json-file (str "res/" city ".json"))
-     (metro.graph/build-subway-graph)
+     (metro.graph/build-optimized-graph)
      (metro.file/create-image))
     ;; Argh. This is ugly
     (Thread/sleep 10)))

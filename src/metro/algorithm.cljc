@@ -60,7 +60,7 @@
 
 (defn initial-subway-config
   [config]
-  (let [graph (metro.graph/build-subway-graph config)]
+  (let [graph (metro.graph/build-optimized-graph config)]
     (assoc (random-initial-station graph) :graph graph)))
 
 (defn initial-subway-graph

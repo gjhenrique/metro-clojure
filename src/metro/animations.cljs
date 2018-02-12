@@ -6,8 +6,6 @@
 
 (enable-console-print!)
 
-(def graph-layout {:name "breadthfirst" :directed true})
-
 (def node-style {:selector "node"
                  :style {"label" "data(id)" "text-margin-x" "7px"
                          "padding" "10px" "text-halign" "right" "text-valign" "center"}})
@@ -42,10 +40,11 @@
   (.getElementById container id))
 
 (defn- create-cy
-  [container graph]
+  [container graph layout]
   (js/cytoscape (clj->js {:container (find-element js/document container)
                           :elements (graph-attrs graph)
-                          :layout graph-layout
+
+                          :layout {:name layout :directed true}
                           :style (concat [node-style edge-style highlighted-style] colors-style) })))
 
 (defn- find-predecessor-edges
@@ -117,12 +116,21 @@
       (swap! state assoc :timeout-id (js/setTimeout #(start-animation state)
                                                     (:timeout @state))))))
 
+(defn ^:export build-raw-animation
+  [containers config]
+  (let [{graph-container :graph_container timeout :timeout git-container :git_container}
+        (js->clj containers :keywordize-keys true)
+        graph (metro.graph/build-raw-graph (js->clj config :keywordize-keys true))
+        cy (create-cy graph-container graph "grid")]
+    cy))
+
 (defn ^:export build-animation
   [containers config]
-  (let [{graph-container :graph_container timeout :timeout git-container :git_container} (js->clj containers :keywordize-keys true)
-        graph (metro.graph/build-subway-graph (js->clj config :keywordize-keys true))
+  (let [{graph-container :graph_container timeout :timeout git-container :git_container}
+        (js->clj containers :keywordize-keys true)
+        graph (metro.graph/build-optimized-graph (js->clj config :keywordize-keys true))
         metro-seq (metro.seq/seq-graph graph)
-        cy (create-cy graph-container graph)
+        cy (create-cy graph-container graph "breadthfirst")
         nodes-edges (cy-nodes-and-edges cy metro-seq graph)]
     (atom {:cy cy
            :git-container (find-element js/document git-container)

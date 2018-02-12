@@ -25,7 +25,7 @@
 
 (defn- connections-without-cycle
   [graph stations line-name]
-  (println (format "[%s] We have to remove some nodes. =(" line-name))
+  (println (str "[" line-name "] We have to remove some nodes. =("))
   (loop [g graph
          final-stations [(first stations)]
          iteration-stations (rest stations)]
@@ -61,7 +61,7 @@
 
 (defn- add-connections
   [graph connections line-name description]
-  (println (format "[%s] Trying %s" line-name description))
+  (println (str "[" line-name "] Trying " description))
   (let [new-graph (apply graph/digraph graph connections)]
     (when (alg/dag? new-graph) connections)))
 
@@ -73,13 +73,25 @@
         (add-connections graph (reverse-stations connections) line-name "Reversed")
         (connections-without-cycle graph (:stations line-config) line-name))))
 
-(defn build-subway-graph
-  [subway-config]
+(defn- build-graph
+  [subway-config partition-fn]
   (reduce
    (fn [graph line-config]
-     (let [connections (valid-connection graph line-config)
+     (let [connections (partition-fn graph line-config)
            new-graph (apply graph/digraph graph connections)]
        (add-attributes new-graph connections (:name line-config))))
    ;; Empty graph
    (graph/digraph)
    subway-config))
+
+(defn build-raw-graph
+  [subway-config]
+  (build-graph subway-config
+               (fn [_ line-config]
+                 (partition 2 1 (:stations line-config)))))
+
+(defn build-optimized-graph
+  [subway-config]
+  (build-graph subway-config
+               (fn [graph line-config]
+                 (valid-connection graph line-config))))
