@@ -3,17 +3,17 @@
             [loom.attr :as attr]
             [metro.graph]))
 
-(defn- visited?
+(defn visited?
   [graph node]
   (attr/attr graph node :visited))
 
-(defn- find-predecessor
+(defn find-predecessor
   [graph node]
   (first (filter
           (fn [p] (not (visited? graph p)))
           (metro.graph/predecessors graph node))))
 
-(defn- find-successors
+(defn find-successors
   [graph node]
   (filter
    (fn [s] (not (visited? graph s)))

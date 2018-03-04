@@ -35,12 +35,21 @@
      var config = [{name: "Red", stations: ["A", "C", "B"]},
                    {name: "Blue", stations: ["C", "B", "A"]}];
 
-      var config = [{name: "Red", stations: ["A", "B", "C"]},
-                   {name: "Blue", stations: ["C", "A", "B"]}];
-     var containers = {graph_container: "graph1", git_container: false};
-     /* var a = metro.animations.build_raw_animation(containers, config);*/
+     var config = [
+       {name: "Red", stations: ["A", "C", "B"]},
+      {name: "Blue", stations: ["C", "E"]}
+     ];
+
+     var containers = {
+       graph_container: "graph1",
+       git_container: "git-operations",
+       current_node: "C",
+       traversal_function: 5,
+     };
+
      var a = metro.animations.build_animation(containers, config);
-     /* metro.animations.start_animation(a);*/
+     metro.animations.start_animation(a);
+     /* var a = metro.animations.build_animation(containers, config);*/
 
      var b = true;
      document.getElementById("vixi").addEventListener("click", function( event ) {

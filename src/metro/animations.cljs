@@ -64,7 +64,8 @@
                           :elems (find-predecessor-edges cy graph (:station station))}
                          {:type :node
                           :elems (find-element cy (:station station))
-                          :git-commands (:commands station)}])
+                          :git-commands (:commands station)
+                          :state (assoc (:state station) :graph "loom-graph")}])
                       stations-seq))))
 
 (defn- add-git-commands
@@ -86,7 +87,7 @@
   [state]
   (js/clearTimeout (:timeout-id @state)))
 
-;; this method is too big. sorry ='|
+;; this function is too big. sorry ='|
 (defn- ^:export start-animation
   [state]
   (if (empty? (:algorithm-seq @state))
@@ -106,7 +107,7 @@
             (when (:git-container @state)
               (remove-git-commands (:git-container @state))
               (add-git-commands (:git-container @state)
-                                (:git-commands element)))
+                                (:state element)))
 
               (.addClass (:elems element) "highlighted"))
 
@@ -118,20 +119,42 @@
 
 (defn ^:export build-raw-animation
   [containers config]
-  (let [{graph-container :graph_container timeout :timeout git-container :git_container}
-        (js->clj containers :keywordize-keys true)
+  (let [{graph-container :graph_container} (js->clj containers :keywordize-keys true)
         graph (metro.graph/build-raw-graph (js->clj config :keywordize-keys true))
         cy (create-cy graph-container graph "grid")]
     cy))
 
+(defn- choose-function-name
+  "Clojurescript mungles the options"
+  [option]
+  (cond
+    (= option 1) metro.algorithm-steps/traverse-step1
+    (= option 2) metro.algorithm-steps/traverse-step2
+    (= option 3) metro.algorithm-steps/traverse-step3
+    :default metro.algorithm/traverse-subway-graph))
+
 (defn ^:export build-animation
   [containers config]
-  (let [{graph-container :graph_container timeout :timeout git-container :git_container}
+  (let [{graph-container :graph_container
+         timeout :timeout
+         git-container :git_container
+         current-node :current_node
+         function-option :traversal_function}
         (js->clj containers :keywordize-keys true)
-        graph (metro.graph/build-optimized-graph (js->clj config :keywordize-keys true))
-        metro-seq (metro.seq/seq-graph graph)
-        cy (create-cy graph-container graph "breadthfirst")
-        nodes-edges (cy-nodes-and-edges cy metro-seq graph)]
+
+        traversal-function
+        (choose-function-name function-option)
+
+         graph (metro.graph/build-optimized-graph (js->clj config :keywordize-keys true))
+
+         metro-seq (metro.seq/build-seq
+                    (traversal-function {:current-node current-node :graph graph})
+                    traversal-function)
+
+         cy (create-cy graph-container graph "breadthfirst")
+
+         nodes-edges (cy-nodes-and-edges cy metro-seq graph)]
+
     (atom {:cy cy
            :git-container (find-element js/document git-container)
            :original-seq nodes-edges
