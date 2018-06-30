@@ -125,7 +125,8 @@
     cy))
 
 (defn- choose-function-name
-  "Clojurescript mungles the options"
+  "Clojurescript mungles the function names.
+  That's why we cant pass the function names as string"
   [option]
   (cond
     (= option 1) metro.algorithm-steps/traverse-step1
@@ -160,3 +161,11 @@
            :original-seq nodes-edges
            :timeout (or timeout 500)
            :algorithm-seq nodes-edges})))
+ 
+
+[
+ {:name "Red",
+  :stations ["A", "C"]},
+ {:name "Green",
+  :stations ["B", "C"]}
+ ]
