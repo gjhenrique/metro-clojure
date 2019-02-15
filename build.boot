@@ -1,21 +1,23 @@
 (set-env!
  :source-paths #{"src"}
  :resource-paths #{"res"}
- :dependencies '[[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.9.495" :scope "test"]
+ :dependencies '[[org.clojure/clojure "1.10.0"]
+                 [org.clojure/clojurescript "1.10.520" :scope "test"]
 
-                 [aysylu/loom "1.0.0"]
+                 [aysylu/loom "1.0.2"]
                  [org.clojure/data.json "0.2.6"]
                  [org.clojure/test.check "0.9.0" :scope "test"]
                  [tolitius/boot-check "0.1.4"]
 
                  ;; cljs
-                 [adzerk/boot-cljs "2.1.1"]
-                 [pandeiro/boot-http "0.7.6"]
+                 [adzerk/boot-cljs "2.1.5"]
+                 [pandeiro/boot-http "0.8.3"]
                  [org.clojure/tools.nrepl "0.2.12"]
-                 [adzerk/boot-reload "0.5.1"]
-                 [adzerk/boot-cljs-repl "0.3.3"]
-                 [com.cemerick/piggieback "0.2.1"]
+                 [adzerk/boot-reload "0.6.0"]
+                 [adzerk/boot-cljs-repl "0.4.0"]
+                 [com.cemerick/piggieback "0.2.2"]
+                 [cider/piggieback "0.3.9" :scope "test"]
+                 [nrepl "0.4.5" :scope "test"]
                  [weasel "0.7.0"]
 
                  [cljsjs/cytoscape "3.1.4-0"]])
