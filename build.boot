@@ -47,12 +47,12 @@
    (target :dir #{"target"})))
 
 (deftask prod
-  []
+  [f folder FOLDER str "The folder to save the optimized js"]
   (comp
    (cljs :optimizations :advanced
          :source-map true
          :compiler-options {:externs ["src/metro/cytoscape_externs.js"]})
-   (target :dir #{"prod"})))
+   (target :dir #{folder})))
 
 (deftask raw-file-to-json
   [c city CITY str "The city with the subways"]

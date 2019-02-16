@@ -35,8 +35,11 @@ jobs:
       - <<: *restore-cache
       - run:
           name: Generate js libraries
-          command: boot prod
-      - <<: *save-cache
+          command: |
+            mkdir -p ~/prod
+            boot prod -f ~/prod
+      - store_artifacts:
+          path: ~/prod
 
 workflows:
   version: 2
