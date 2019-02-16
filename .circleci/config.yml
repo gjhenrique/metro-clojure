@@ -39,7 +39,9 @@ jobs:
             mkdir -p ~/prod
             boot prod -f ~/prod
       - store_artifacts:
-          path: ~/prod
+          path: ~/prod/main.js
+          path: ~/prod/main.js.map
+          path: ~/prod/index.html
 
 workflows:
   version: 2
