@@ -37,12 +37,13 @@ jobs:
           name: Generate js libraries
           command: |
             mkdir -p ~/prod
+            mkdir -p ~/prod-files
             boot prod -f ~/prod
+            mv ~/prod/main.js ~/prod-files/main.js
+            mv ~/prod/main.js.map ~/prod-files/main.js.map
+            mv ~/prod/index.html ~/prod-files/index.html
       - store_artifacts:
-          path:
-            - ~/prod/main.js
-            - ~/prod/main.js.map
-            - ~/prod/index.html
+          path: ~/prod-files
 
 workflows:
   version: 2
