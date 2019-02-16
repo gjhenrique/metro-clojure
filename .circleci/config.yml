@@ -23,8 +23,8 @@ jobs:
       - checkout
       - <<: *restore-cache
       - run:
-        name: Boot test
-        command: boot test
+          name: Boot test
+          command: boot test
       - <<: *save-cache
 
   generate_js:
