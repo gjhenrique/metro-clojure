@@ -1,0 +1,24 @@
+version: 2
+
+jobs:
+  run_test:
+    docker:
+      - image: circleci/clojure:boot-2.8.2
+    steps:
+      - checkout
+      - type: cache-restore
+        name: Restoring dependencies
+        keys:
+          - project-{{checksum "boot.properties" }}-{{ checksum "build.boot" }}
+
+      - run:
+          name: Run tests
+          command: boot test
+
+      - type: cache-save
+        name: Store bundle cache
+        key: project-{{checksum "boot.properties" }}-{{ checksum "build.boot" }}
+        paths:
+          - ~/.m2
+          - ~/.boot/cache/lib
+          - ~/.boot/cache/bin
