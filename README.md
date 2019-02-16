@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/gjhenrique/metro-clojure.svg?style=svg)](https://circleci.com/gh/gjhenrique/metro-clojure)
+
 ## Motivation
 A few years ago, I saw a repo called [MetroGit](https://github.com/vbarbaresi/MetroGit).
 This repo is, in fact, a git graph taken from Paris metro map.
