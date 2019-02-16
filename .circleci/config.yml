@@ -34,13 +34,13 @@ jobs:
       - checkout
       - <<: *restore-cache
       - run:
-        name: Generate js libraries
-        command: boot prod
+          name: Generate js libraries
+          command: boot prod
       - <<: *save-cache
 
 workflows:
   version: 2
-  run-tests:
+  test-and-build:
     jobs:
       - run_test
       - generate_js:
