@@ -22,3 +22,9 @@ jobs:
           - ~/.m2
           - ~/.boot/cache/lib
           - ~/.boot/cache/bin
+
+workflows:
+  version: 2
+  setup-test-build-deploy:
+    jobs:
+      - run_test
