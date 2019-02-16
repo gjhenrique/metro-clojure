@@ -1,30 +1,52 @@
 version: 2
 
+.restore-cache: &restore-cache
+  - type: cache-restore
+    name: Restoring dependencies
+    keys:
+      - project-{{checksum "boot.properties" }}-{{ checksum "build.boot" }}
+
+.save-cache: &save-cache
+  - type: cache-save
+    name: Store bundle cache
+    key: project-{{checksum "boot.properties" }}-{{ checksum "build.boot" }}
+    paths:
+      - ~/.m2
+      - ~/.boot/cache/lib
+      - ~/.boot/cache/bin
+
 jobs:
   run_test:
     docker:
       - image: circleci/clojure:boot-2.8.2
     steps:
       - checkout
-      - type: cache-restore
-        name: Restoring dependencies
-        keys:
-          - project-{{checksum "boot.properties" }}-{{ checksum "build.boot" }}
-
+      - <<: *restore-cache
       - run:
-          name: Run tests
-          command: boot test
+        name: Boot test
+        command: boot test
+      - <<: *save-cache
 
-      - type: cache-save
-        name: Store bundle cache
-        key: project-{{checksum "boot.properties" }}-{{ checksum "build.boot" }}
-        paths:
-          - ~/.m2
-          - ~/.boot/cache/lib
-          - ~/.boot/cache/bin
+  generate_js:
+    docker:
+      - image: circleci/clojure:boot-2.8.2
+    steps:
+      - checkout
+      - <<: *restore-cache
+      - run:
+        name: Generate js libraries
+        command: boot prod
+      - <<: *save-cache
 
 workflows:
   version: 2
-  setup-test-build-deploy:
+  run-tests:
     jobs:
       - run_test
+      - generate_js:
+          requires:
+            - run_test
+          filters:
+            branches:
+              only:
+                - master

@@ -28,7 +28,7 @@
          '[metro.seq]
          '[clojure.data.json :as json]
          '[tolitius.boot-check :as check]
-         '[adzerk.boot-test :refer :all]
+         '[adzerk.boot-test :as boot-test]
 
          '[adzerk.boot-cljs :refer [cljs]]
          '[pandeiro.boot-http :refer [serve]]
@@ -89,6 +89,8 @@
     (check/with-kibit)
     (check/with-bikeshed)))
 
-(set-env! :source-paths #{"src" "test"})
+(deftask test []
+  (set-env! :source-paths #{"src" "test"})
+  (boot-test/test))
 
 (boot.core/load-data-readers!)
