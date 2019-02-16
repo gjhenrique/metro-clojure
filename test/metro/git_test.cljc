@@ -1,5 +1,5 @@
-(ns metro.git
-  (:require [metro.git :as sut]
+(ns metro.git-test
+  (:require [metro.git :refer :all]
             [clojure.test :as t]
             [clojure.string :as str]))
 
@@ -8,7 +8,7 @@
                {:station "C" :line '("Blue")}])
 
 (t/deftest simple-git-operations
-  (let [commands (sut/git-commands linear-g)]
+  (let [commands (git-commands linear-g)]
     (t/is (= commands [["git checkout --orphan \"Blue\""
                         (git-commit "A")]
 
@@ -20,7 +20,7 @@
               {:station "B" :line '("Blue" "Red")}])
 
 (t/deftest merge-git-operations
-  (let [commands (sut/git-commands merge-g) ]
+  (let [commands (git-commands merge-g) ]
     (t/is (= commands [["git checkout --orphan \"Red\""
                        (git-commit "C")]
                        ["git checkout --orphan \"Blue\""
@@ -33,7 +33,7 @@
                  {:station "D" :line '("Yellow")}])
 
 (t/deftest existing-git-operations
-  (let [commands (sut/git-commands existing-g)]
+  (let [commands (git-commands existing-g)]
     (t/is (= commands [["git checkout --orphan \"Red\""
                         (git-commit "C")]
                        [(git-commit "B")

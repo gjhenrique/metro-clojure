@@ -1,6 +1,7 @@
-(ns metro.algorithm
+(ns metro.algorithm-test
   (:require  [clojure.test :as t]
              [metro.graph :refer [build-optimized-graph]]
+             [metro.algorithm :refer :all]
              [loom.attr :as attr]))
 
 (def linear-g [{:name "Blue" :stations ["A" "B" "C"]}])

@@ -7,6 +7,7 @@
                  [aysylu/loom "1.0.2"]
                  [org.clojure/data.json "0.2.6"]
                  [org.clojure/test.check "0.9.0" :scope "test"]
+                 [adzerk/boot-test "1.2.0" :scope "test"]
                  [tolitius/boot-check "0.1.4"]
 
                  ;; cljs
@@ -27,6 +28,7 @@
          '[metro.seq]
          '[clojure.data.json :as json]
          '[tolitius.boot-check :as check]
+         '[adzerk.boot-test :refer :all]
 
          '[adzerk.boot-cljs :refer [cljs]]
          '[pandeiro.boot-http :refer [serve]]
@@ -86,5 +88,7 @@
     (check/with-eastwood)
     (check/with-kibit)
     (check/with-bikeshed)))
+
+(set-env! :source-paths #{"src" "test"})
 
 (boot.core/load-data-readers!)
