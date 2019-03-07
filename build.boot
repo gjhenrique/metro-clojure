@@ -52,7 +52,7 @@
    (cljs :optimizations :advanced
          :source-map true
          :compiler-options {:externs ["src/metro/cytoscape_externs.js"]})
-   (target :dir #{folder})))
+   (target :dir #{(or folder "prod")})))
 
 (deftask raw-file-to-json
   [c city CITY str "The city with the subways"]
