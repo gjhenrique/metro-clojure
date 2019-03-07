@@ -107,7 +107,7 @@
             (when (:git-container @state)
               (remove-git-commands (:git-container @state))
               (add-git-commands (:git-container @state)
-                                (:state element)))
+                                (:git-commands element)))
 
               (.addClass (:elems element) "highlighted"))
 

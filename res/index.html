@@ -39,6 +39,8 @@
         {name: "Blue", stations: ["D", "B", "E"]},
         {name: "Green", stations: ["F", "B", "G"]}];
 
+     /* var config = [{name: "Red", stations: ["C", "D", "B"]}, */
+     /* {name: "Blue", stations: ["C", "B"]}]; */
 
      var containers = {
        graph_container: "graph1",
@@ -48,18 +50,16 @@
      };
 
      var a = metro.animations.build_animation(containers, config);
-     /* metro.animations.start_animation(a); */
-     /* var a = metro.animations.build_animation(containers, config);*/
 
-     var b = false;
+     var running = false;
      document.getElementById("vixi").addEventListener("click", function( event ) {
-       if (b) {
+       if (running) {
          metro.animations.stop_animation(a);
-         b = false
+         running = false
        }
        else {
          metro.animations.start_animation(a);
-         b = true;
+         running = true;
        }
      }, false);
      /* metro.animations.start_animation({graph_container: "graph2"}, config)*/
