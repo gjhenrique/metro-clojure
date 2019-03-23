@@ -3,8 +3,8 @@
             [clojure.set :as set]))
 
 (defn git-checkout
-  [branch repo]
-  (if (contains? (set (keys repo)) branch)
+  [branch current-branches]
+  (if (contains? (set current-branches) branch)
     (str "git checkout \"" branch "\"")
     (str "git checkout --orphan \"" branch "\"")))
 
@@ -64,7 +64,7 @@
 
      ;; checkout to the branch
      (if-not (= head new-head)
-       (swap! commands conj (git-checkout new-head repo)))
+       (swap! commands conj (git-checkout new-head (keys repo))))
 
      ;; check if branch has more than one pointing to new-head
      (let [merging-branches (find-divergent-branches new-head repo branches)
