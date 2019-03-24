@@ -53,9 +53,8 @@
   [graph connections line]
   (reduce
    (fn [g station]
-     (attr/add-attr g station :lines
-                    (conj (or (attr/attr g station :lines) [])
-                          line)))
+     (let [current-line (or (loom.attr/attr g station :lines) [])]
+       (attr/add-attr g station :lines (conj current-line line))))
    graph
    (set (flatten connections))))
 
