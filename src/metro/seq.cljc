@@ -28,18 +28,18 @@
      ISeqable
      (-seq [self] self)))
 
-(defn seq-first
+(defn- seq-first
   [algorithm-state git-state]
   {:station (:current-node algorithm-state)
    :line (:current-line algorithm-state)
    :commands (:commands git-state)
    :state algorithm-state})
 
-(defn seq-rest
+(defn- seq-rest
   [self]
   (or (next self) '()))
 
-(defn seq-next
+(defn- seq-next
   [algorithm-state git-state traversal-algorithm-fn]
   (let [new-state (traversal-algorithm-fn algorithm-state)]
     (when-not (nil? new-state)
