@@ -33,7 +33,7 @@
     (cond
       end nil
 
-      (and (not (nil? predecessor)))
+      (not (nil? predecessor))
       (traverse-subway-graph (assoc state :current-node predecessor))
 
       (and (visited? graph current-node) (seq successors))
