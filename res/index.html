@@ -6,41 +6,50 @@
   </head>
   <body>
     <style>
-      .graph {
-       width: 500px;
-       height: 500px;
+     .metro-animation {
+       margin-top: -20px;
+       display: flex;
+       height: 300px;
+
+       max-width: 676px;
+     }
+
+     .metro-graph {
+       position: relative;
+       z-index: 0;
+       margin-top: -20px;
+       width: 47%;
+       height: 100%;
        display: inline-block;
      }
 
-     .git-container {
-       display: inline-block;
+     .metro-git-container {
+       font-family: 'Source Code Pro', monospace;
+       width: 45%;
+       height: 100%;
+       overflow: auto;
+
+       display: flex;
+       justify-content: center;
+       flex-direction: column;
      }
 
-     .animation {
-       display: block;
+     .metro-git-container span {
+       display: inline-block;
      }
     </style>
-    <h1 id="vixi">Ola</h1>
-    <div class="animation">
-      <div id="graph1" class="graph"></div>
-      <div id="git-operations" class="git-container"></div>
-    </div>
 
-    <div class="animation">
-      <div id="graph2" class="graph"></div>
+    <h1 id="vixi">Ola</h1>
+    <div class="metro-animation">
+      <div id="graph1" class="metro-graph"></div>
+      <div id="git-operations" class="metro-git-container"></div>
     </div>
 
     <script src="main.js"></script>
     <script>
-     var config = [{name: "Red", stations: ["A", "C", "B"]},
-                   {name: "Blue", stations: ["C", "B", "A"]}];
-
      var config = [{name: "Red", stations: ["A", "B", "C"]},
         {name: "Blue", stations: ["D", "B", "E"]},
         {name: "Green", stations: ["F", "B", "G"]}];
-
-     /* var config = [{name: "Red", stations: ["C", "D", "B"]}, */
-     /* {name: "Blue", stations: ["C", "B"]}]; */
 
      var containers = {
        graph_container: "graph1",
