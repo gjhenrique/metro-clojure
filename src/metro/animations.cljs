@@ -44,7 +44,7 @@
   (js/cytoscape (clj->js {:container (find-element js/document container)
                           :elements (graph-attrs graph)
 
-                          :layout {:name layout :directed true}
+                          :layout {:name (or layout "breadthfirst") :directed true}
                           :style (concat [node-style edge-style highlighted-style] colors-style) })))
 
 (defn- find-predecessor-edges
@@ -119,9 +119,9 @@
 
 (defn ^:export build-raw-animation
   [containers config]
-  (let [{graph-container :graph_container} (js->clj containers :keywordize-keys true)
+  (let [{layout :layout graph-container :graph_container} (js->clj containers :keywordize-keys true)
         graph (metro.graph/build-raw-graph (js->clj config :keywordize-keys true))
-        cy (create-cy graph-container graph "grid")]
+        cy (create-cy graph-container graph layout)]
     cy))
 
 (defn- choose-function-name
@@ -140,6 +140,7 @@
          timeout :timeout
          git-container :git_container
          current-node :current_node
+         layout :layout
          function-option :traversal_function}
         (js->clj containers :keywordize-keys true)
 
@@ -152,7 +153,7 @@
                     (traversal-function {:current-node current-node :graph graph})
                     traversal-function)
 
-         cy (create-cy graph-container graph "breadthfirst")
+         cy (create-cy graph-container graph layout)
 
          nodes-edges (cy-nodes-and-edges cy metro-seq graph)]
 
