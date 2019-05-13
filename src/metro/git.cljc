@@ -24,29 +24,30 @@
        (str/join " " branches)))
 
 (defn pick-head
-  [head repo branches]
+  [current-head repo station-branches]
   (if (and
-       (contains? (set branches) head)
-       (contains? (set (keys repo)) head))
-    head
-    (first branches)))
+       (contains? (set station-branches) current-head)
+       (contains? (set (keys repo)) current-head))
+    current-head
+    (first station-branches)))
 
-(defn find-divergent-branches
+(defn find-merge-branches
   [head repo branches]
-  (let [station (get repo head)]
+  (let [head-station (get repo head)]
     (filter
      (fn [branch]
        (let [branch-station (get repo branch)]
          (and
           (not (nil? branch-station))
-          (not= branch-station station)
+          (not= branch-station head-station)
           (not= branch head))))
      branches)))
 
-(defn find-remaining-branches
+(defn find-companion-branches
   [head merging-branches branches]
-  (->> (set/difference (set branches) (set merging-branches))
-       (remove #{head})))
+  (->>
+   (set/difference (set branches) (set merging-branches))
+   (remove #{head})))
 
 (defn update-repo
   [repo branches commit-name]
@@ -67,8 +68,8 @@
        (swap! commands conj (git-checkout new-head (keys repo))))
 
      ;; check if branch has more than one pointing to new-head
-     (let [merging-branches (find-divergent-branches new-head repo branches)
-           remaining-branches (find-remaining-branches new-head merging-branches branches)]
+     (let [merging-branches (find-merge-branches new-head repo branches)
+           remaining-branches (find-companion-branches new-head merging-branches branches)]
        (if (> (count merging-branches) 0)
          (swap! commands conj (git-merge commit-name merging-branches))
          (swap! commands conj (git-commit commit-name)))
