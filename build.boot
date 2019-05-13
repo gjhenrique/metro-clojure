@@ -17,7 +17,7 @@
                  [adzerk/boot-reload "0.6.0"]
                  [adzerk/boot-cljs-repl "0.4.0"]
                  [com.cemerick/piggieback "0.2.2"]
-                 [cider/piggieback "0.3.9" :scope "test"]
+                 [cider/piggieback "0.4.0" :scope "test"]
                  [nrepl "0.4.5" :scope "test"]
                  [weasel "0.7.0"]
 
