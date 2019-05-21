@@ -10,7 +10,7 @@
      (let [current-line (or (loom.attr/attr g station :lines) [])]
        (loom.attr/add-attr g station :lines (conj current-line line-name))))
    graph
-   (set (flatten stations))))
+   (set (flatten stations)))) 
 
 (defn build-graph-without-cycles
   "Build a new loom graph with the stations
@@ -29,10 +29,10 @@
    (loom.graph/digraph)
    config)) 
 
-(def config1 [{:name "Red", :stations ["A", "C"]},
-             {:name "Blue", :stations ["B", "C"]}]) 
-(build-graph-without-cycles config1) 
-
+(def config [{:name "Red", :stations ["A", "C"]},
+                {:name "Blue", :stations ["B", "C"]}]) 
+(def g (build-graph-without-cycles config)) 
+(loom.graph/edges g) 
 
 (defn- reverse-stations
   "Reversing [[A B] [B C]] to [[C B] [B C]]"
@@ -111,9 +111,9 @@
         connections (partition 2 1 (:stations line-config))]
     (or (connections-without-cycle graph connections)
         (connections-without-cycle graph (reverse-stations connections))
-        (connections-removing-cycles graph (:stations line-config) line-name))))
+        (connections-removing-cycles graph (:stations line-config) line-name)))) 
 
-(defn build-graph-with-cycles
+(defn build-graph
   "Build a graph and remove cycles"
   [config]
   (reduce
@@ -122,11 +122,11 @@
            new-graph (apply loom.graph/digraph graph connections)]
        (add-line-information new-graph connections (:name line-config))))
    (loom.graph/digraph)
-   config))
+   config)) 
 
 (def config2 [{:name "Red" :stations ["B" "C" "D" "B"]}]) 
 
-(def g (build-graph-reversal config2)) 
+(def g (build-graph config2)) 
 
 (loom.graph/edges g) 
 
@@ -141,11 +141,11 @@
   (let [{:keys [graph current-node]} state]
       (assoc state
              :current-line (lines graph current-node)
-             :graph (loom.attr/add-attr graph current-node :visited true))))
+             :graph (loom.attr/add-attr graph current-node :visited true)))) 
 
 
 (def config [{:name "Green" :stations ["A" "B" "C"]}]) 
-(def g (build-graph-with-cycles config))
+(def g (build-graph-with-cycles config)) 
 
 ;; => (def state1 (traverse-graph-single-station {:graph g :current-node "B"})) 
 ;; state1 
@@ -173,238 +173,288 @@
   (let [{:keys [graph current-node current-line]} state
         predecessor (find-unvisited-predecessor graph current-node)]
     (cond
+      ;; NEW STEP
       (not (nil? predecessor))
       (traverse-graph-with-predecessors
        (assoc state :current-node predecessor))
 
       :else
+      ;; Old step
       (assoc state
-             :current-line (metro.graph/lines graph current-node)
-             :graph (loom.attr/add-attr graph current-node :visited true)))))
+             :current-line (lines graph current-node)
+             :graph (loom.attr/add-attr graph current-node :visited true))))) 
 
 (def config [{:name "Green" :stations ["A" "B" "C"]}]) 
-(def g (build-graph-without-cycles config)) 
+(def g (build-graph config)) 
 
 (def state1 (traverse-graph-with-predecessors {:graph g :current-node "B"})) 
 (def state2 (traverse-graph-with-predecessors state1)) 
 (def state3 (traverse-graph-with-predecessors state2)) 
 
-;; (defn traverse-graph-with-pending-stations
-;;   "When picking a station from multiple successors, add the remaining stations in the pending-nodes list"
-;;   [state]
-;;   (let [{:keys [graph current-node current-line pending-nodes end]} state
-;;         predecessor (find-unvisited-predecessor graph current-node)
-;;         successors (find-unvisited-successors graph current-node)]
-;;     (cond
-;;       (not (nil? predecessor))
-;;       (traverse-graph-with-pending-stations (assoc state :current-node predecessor))
+(defn find-unvisited-successors
+  [graph node]
+  (filter
+   (fn [s] (not (visited? graph s)))
+          (loom.graph/successors graph node))) 
 
-;;       (and (visited? graph current-node) (seq successors))
-;;       (traverse-graph-with-pending-stations (assoc state
-;;                                     :current-node (first successors)
-;;                                     :pending-nodes (concat pending-nodes (rest successors))))
+(defn traverse-graph-with-successors
+  "Continue the traversal when there are unvisited succcessors"
+  [state]
+  (let [{:keys [graph current-node current-line]} state
+        predecessor (find-unvisited-predecessor graph current-node)
+        successors (find-unvisited-successors graph current-node)]
+    (cond
+      ;; Old step
+      (not (nil? predecessor))
+      (traverse-graph-with-successors
+       (assoc state :current-node predecessor))
 
-;;       (and (visited? graph current-node) (empty? successors))
-;;       (traverse-graph-with-pending-stations (assoc state
-;;                                     :current-node (first pending-nodes)
-;;                                     :pending-nodes (rest pending-nodes)))
+      ;; NEW Step
+      (and (visited? graph current-node) (seq successors))
+      (traverse-graph-with-successors
+       (assoc state :current-node (first successors)))
 
-;;       :else
-;;       (assoc state
-;;              :pending-nodes (remove #{current-node} pending-nodes)
-;;              :current-line (lines graph current-node)
-;;              :graph (loom.attr/add-attr graph current-node :visited true)))))
+      :else
+      ;; Old step
+      (assoc state
+             :current-line (lines graph current-node)
+             :graph (loom.attr/add-attr graph current-node :visited true))))) 
 
-;; (def config [{:name "Green" :stations ["A", "B", "C"]},
-;;              {:name "Red" :stations ["D", "B", "E"]}])
+(def config [{:name "Green" :stations ["A" "B" "C"]}]) 
+(def g (build-graph config)) 
+(def state1 (traverse-graph-with-successors {:graph g :current-node "B"})) 
+(def state2 (traverse-graph-with-successors state1)) 
+(def state3 (traverse-graph-with-successors state2)) 
 
-;; (def g (build-graph config)) 
+  
+(defn traverse-graph-with-pending-stations
+  "When picking a station from multiple successors, add the remaining stations in the pending-nodes list"
+  [state]
+  (let [{:keys [graph current-node current-line pending-nodes end]} state
+        predecessor (find-unvisited-predecessor graph current-node)
+        successors (find-unvisited-successors graph current-node)]
+    (cond
+      ;; Old Stepo
+      (not (nil? predecessor))
+      (traverse-graph-with-pending-stations (assoc state :current-node predecessor))
 
-;; (def state1 (traverse-graph-with-pending-stations {:graph g :current-node "B"})) 
-;; (def state2 (traverse-graph-with-pending-stations state1)) 
-;; (def state3 (traverse-graph-with-pending-stations state2)) 
-;; (def state4 (traverse-graph-with-pending-stations state3)) 
-;; (def state5 (traverse-graph-with-pending-stations state4)) 
+      ;; CHANGED Step
+      (and (visited? graph current-node) (seq successors))
+      (traverse-graph-with-pending-stations (assoc state
+                                    :current-node (first successors)
+                                    :pending-nodes (concat pending-nodes (rest successors))))
 
-;; (defn traverse-graph
-;;   "In the final station, pass a key called end. If this key is present, nil is returned"
-;;   [state]
-;;   (let [{:keys [graph current-node current-line pending-nodes end]} state
-;;         predecessor (find-predecessor graph current-node)
-;;         successors (find-successors graph current-node)]
-;;     (cond
-;;       end nil
+      ;; NEW Step
+      (and (visited? graph current-node) (empty? successors))
+      (traverse-graph-with-pending-stations (assoc state
+                                    :current-node (first pending-nodes)
+                                    :pending-nodes (rest pending-nodes)))
 
-;;       (not (nil? predecessor))
-;;       (traverse-graph (assoc state :current-node predecessor))
+      :else
+      ;; CHANGED Step
+      (assoc state
+             :pending-nodes (remove #{current-node} pending-nodes)
+             :current-line (lines graph current-node)
+             :graph (loom.attr/add-attr graph current-node :visited true))))) 
 
-;;       (and (visited? graph current-node) (seq successors))
-;;       (traverse-graph (assoc state
-;;                               :current-node (first successors)
-;;                               :pending-nodes (concat pending-nodes (rest successors))))
+(def config [{:name "Green" :stations ["A", "B", "C"]},
+             {:name "Red" :stations ["D", "B", "E"]}]) 
 
-;;       (and (visited? graph current-node) (empty? successors))
-;;       (traverse-graph (assoc state
-;;                               :current-node (first pending-nodes)
-;;                               :pending-nodes (rest pending-nodes)))
-;;       (and (empty? successors) (empty? pending-nodes))
-;;       (assoc state
-;;              :current-line (metro.graph/lines graph current-node)
-;;              :graph (loom.attr/add-attr graph current-node :visited true)
-;;              :end true)
+(def g (build-graph config)) 
 
-;;       :else
-;;       (assoc state
-;;              :pending-nodes (remove #{current-node} pending-nodes)
-;;              :current-line (metro.graph/lines graph current-node)
-;;              :graph (loom.attr/add-attr graph current-node :visited true))))) 
+(def state1 (traverse-graph-with-pending-stations {:graph g :current-node "B"})) 
+(def state2 (traverse-graph-with-pending-stations state1)) 
+(def state3 (traverse-graph-with-pending-stations state2)) 
+(def state4 (traverse-graph-with-pending-stations state3)) 
+(def state5 (traverse-graph-with-pending-stations state4)) 
 
-;; (def config [{:name "Green" :stations ["A", "B", "C"]},
-;;              {:name "Red" :stations ["D", "B", "E"]}]) 
+(defn traverse-graph
+  "In the final station, pass a key called end. If this key is present, nil is returned"
+  [state]
+  (let [{:keys [graph current-node current-line pending-nodes end]} state
+        predecessor (find-unvisited-predecessor graph current-node)
+        successors (find-unvisited-successors graph current-node)]
+    (cond
+      ;; NEW Step
+      end nil
 
-;; (def g (build-graph config)) 
+      ;; Old Step
+      (not (nil? predecessor))
+      (traverse-graph (assoc state :current-node predecessor))
 
-;; (def state1 (traverse-graph {:graph g :current-node "B"})) 
-;; (def state2 (traverse-graph state1)) 
-;; (def state3 (traverse-graph state2)) 
-;; (def state4 (traverse-graph state3)) 
-;; (def state5 (traverse-graph state4)) 
-;; (def state6 (traverse-graph state5)) 
+      ;; Old Step
+      (and (visited? graph current-node) (seq successors))
+      (traverse-graph (assoc state
+                              :current-node (first successors)
+                              :pending-nodes (concat pending-nodes (rest successors))))
 
+      ;; Old Step
+      (and (visited? graph current-node) (empty? successors))
+      (traverse-graph (assoc state
+                              :current-node (first pending-nodes)
+                              :pending-nodes (rest pending-nodes)))
 
-;; (defn initial-state
-;;   [graph]
-;;   (let [station (first (loom.graph/nodes graph))]
-;;     {:graph graph
-;;      :pending-nodes ()
-;;      :current-node station
-;;      :current-line (lines graph station)}))
+      ;; NEW Step
+      (and (empty? successors) (empty? pending-nodes))
+      (assoc state
+             :current-line (metro.graph/lines graph current-node)
+             :graph (loom.attr/add-attr graph current-node :visited true)
+             :end true)
 
-;; (initial-state g)
+      :else
+      ;; Old Step
+      (assoc state
+             :pending-nodes (remove #{current-node} pending-nodes)
+             :current-line (metro.graph/lines graph current-node)
+             :graph (loom.attr/add-attr graph current-node :visited true))))) 
 
+(def config [{:name "Red" :stations ["A" "B" "C"]}]) 
+ 
 
-;; (defn git-checkout
-;;   [branch current-branches]
-;;   ;; current-branches have all the already created branches
-;;   (if (contains? (set current-branches) branch)
-;;     (str "git checkout \"" branch "\"")
-;;     (str "git checkout --orphan \"" branch "\"")))
+(def g (build-graph config)) 
 
-;; (defn git-commit
-;;   [commit-name]
-;;   (str "git commit --allow-empty -m \"" commit-name "\""))
-
-;; (defn create-git-commands-single
-;;   "Returns an array of commands from a single line/branch"
-;;   ([commit-name branch]
-;;    (create-git-commands-single {} commit-name branch))
-
-;;   ([state commit-name branch]
-;;    (let [current-branch (:current-branch state)
-;;          commands (atom [])]
-
-;;      (if (nil? current-branch)
-;;        (swap! commands conj (git-checkout commit-name branch)))
-
-;;      (swap! commands conj (git-commit commit-name))
-
-;;      (assoc state
-;;             :commands (flatten (deref commands))
-;;             :current-branch branch))))
-
-;; ;; (def state1 (metro.blog/create-git-commands-single "A" '("Blue")))
-;; ;; (:commands state1) 
-;; ;; (def state2 (metro.blog/create-git-commands1 state1 "B" '("Blue")))
-;; ;; (:commands state2) 
-;; ;; (def state3 (metro.blog/create-git-commands1 state2 "C" '("Blue")))
-;; ;; (:commands state3) 
+(def state1 (traverse-graph {:graph g :current-node "B"})) 
+(def state2 (traverse-graph state1)) 
+(def state3 (traverse-graph state2)) 
+(def state4 (traverse-graph state3)) 
 
 
-;; (defn pick-head
-;;   [current-head repo station-branches]
-;;   (if (and
-;;        (contains? (set station-branches) current-head)
-;;        (contains? (set (keys repo)) current-head))
-;;     current-head
-;;     (first station-branches)))
+(defn initial-state
+  "Selects any node of the graph and bootstrap
+   the arguments for the traversal"
+  [graph]
+  (let [station (first (loom.graph/nodes graph))]
+    {:graph graph
+     :pending-nodes ()
+     :current-node station
+     :current-line (lines graph station)})) 
 
-;; (def head1 (pick-head nil {} '("Blue")))
-;; ;; => "Blue"
-;; (def head2 (pick-head head1 {"Blue" '("A")} '("Red" "Blue"))) 
-;; ;; => "Blue"
-;; (def head3 (pick-head head2 {"Blue" '("A" "B") "Red" '("B")} '("Red"))) 
-;; ;; => "Red"
+(def config [{:name "Red" :stations ["A" "B" "C"]}]) 
+(def graph (build-graph config)) 
+(def state1 (initial-state g)) 
+(:current-node state1) 
+;; "C"
 
-;; (defn find-merge-branches
-;;   [head repo branches]
-;;   (let [head-station (get repo head)]
-;;     (filter
-;;      (fn [branch]
-;;        (let [branch-station (get repo branch)]
-;;          (and
-;;           (not (nil? branch-station))
-;;           (not= branch-station head-station)
-;;           (not= branch head))))
-;;      branches)))
+(defn git-checkout
+  [branch current-branches]
+    (str "git checkout \"" branch "\"")
+    (str "git checkout --orphan \"" branch "\"")) 
 
-;; (find-merge-branches nil {} '("Blue"))
-;; ;; => ()
-;; (find-merge-branches "Blue" {"Blue" "A"} '("Red"))
-;; ;; => ()
-;; (find-merge-branches "Red" {"Blue" "A" "Red" "C"} '("Red" "Blue")) 
-;; ;; => ("Blue")
+(defn git-commit
+  [commit-name]
+  (str "git commit --allow-empty -m \"" commit-name "\"")) 
 
-;; (defn find-companion-branches
-;;   [head merging-branches branches]
-;;   (->> (set/difference (set branches) (set merging-branches))
-;;        (remove #{head})))
+(defn create-git-commands-single
+  "Returns an array of commands from a single line/branch"
+  ([commit-name branch]
+   (create-git-commands-single {} commit-name branch))
 
-;; (find-companion-branches "Red" '("Blue") '("Red" "Blue")) 
-;; (find-companion-branches "Red" '() '("Red" "Blue")) 
-;; ;; (find-merge-branches "Blue" {} '("Blue"))
+  ([state commit-name branch]
+   (let [current-branch (:current-branch state)
+         commands (atom [])]
 
-;; (defn git-force-branch
-;;   [branches]
-;;   (map (fn [branch] (str "git branch -f \"" branch "\" HEAD")) branches))
+     (if (nil? current-branch)
+       (swap! commands conj (git-checkout commit-name branch)))
 
-;; (defn git-merge
-;;   [commit-name branches]
-;;   (str "git merge --strategy=ours --allow-unrelated-histories --no-ff --commit -m \""
-;;        commit-name
-;;        "\" "
-;;        (str/join " " branches)))
+     (swap! commands conj (git-commit commit-name))
 
-;; (defn update-repo
-;;   [repo branches commit-name]
-;;   (into repo (map (fn [branch] {branch commit-name}) branches)))
+     (assoc state
+            :commands (flatten (deref commands))
+            :current-branch branch)))) 
 
-;; (defn create-git-commands
-;;   ([commit-name branches]
-;;    (create-git-commands {} commit-name branches))
+(def state1 (create-git-commands-single "A" '("Blue")))
+(:commands state1) 
+(def state2 (create-git-commands-single state1 "B" '("Blue")))
+(:commands state2) 
+(def state3 (create-git-commands-single state2 "C" '("Blue")))
+(:commands state3) 
 
-;;   ([state commit-name branches]
-;;    (let [repo (or (:repo state) {})
-;;          head (:head state)
-;;          commands (atom [])
-;;          new-head (pick-head head repo branches)]
 
-;;      ;; checkout to the branch
-;;      (if-not (= head new-head)
-;;        (swap! commands conj (git-checkout new-head (keys repo))))
+(defn pick-head
+  [current-head repo station-branches]
+  (if (and
+       (contains? (set station-branches) current-head)
+       (contains? (set (keys repo)) current-head))
+    current-head
+    (first station-branches))) 
 
-;;      ;; check if branch has more than one pointing to new-head
-;;      (let [merging-branches (find-merge-branches new-head repo branches)
-;;            companion-branches (find-companion-branches new-head merging-branches branches)]
-;;        (if (> (count merging-branches) 0)
-;;          (swap! commands conj (git-merge commit-name merging-branches))
-;;          (swap! commands conj (git-commit commit-name)))
+(def head1 (pick-head nil {} '("Blue"))) 
+;; => "Blue"
+(def head2 (pick-head head1 {"Blue" '("A")} '("Red" "Blue"))) 
+;; => "Blue"
+(def head3 (pick-head head2 {"Blue" '("A" "B") "Red" '("B")} '("Red"))) 
+;; => "Red"
 
-;;        (let [not-head-branches (concat merging-branches companion-branches)]
-;;          (swap! commands conj (git-force-branch not-head-branches))))
+(defn find-merge-branches
+  [head repo branches]
+  (let [head-station (get repo head)]
+    (filter
+     (fn [branch]
+       (let [branch-station (get repo branch)]
+         (and
+          (not (nil? branch-station))
+          (not= branch-station head-station)
+          (not= branch head))))
+     branches)))
 
-;;      (assoc state :commands (flatten (deref commands))
-;;             :head new-head
-;;             :repo (update-repo repo branches commit-name)))))
+(find-merge-branches nil {} '("Blue"))
+;; => ()
+(find-merge-branches "Blue" {"Blue" "A"} '("Red"))
+;; => ()
+(find-merge-branches "Red" {"Blue" "A" "Red" "C"} '("Red" "Blue")) 
+;; => ("Blue")
+
+(defn find-companion-branches
+  [head merging-branches branches]
+  (->> (set/difference (set branches) (set merging-branches))
+       (remove #{head})))
+
+(find-companion-branches "Red" '("Blue") '("Red" "Blue")) 
+(find-companion-branches "Red" '() '("Red" "Blue")) 
+;; (find-merge-branches "Blue" {} '("Blue"))
+
+(defn git-force-branch
+  [branches]
+  (map (fn [branch] (str "git branch -f \"" branch "\" HEAD")) branches))
+
+(defn git-merge
+  [commit-name branches]
+  (str "git merge --strategy=ours --allow-unrelated-histories --no-ff --commit -m \""
+       commit-name
+       "\" "
+       (str/join " " branches)))
+
+(defn update-repo
+  [repo branches commit-name]
+  (into repo (map (fn [branch] {branch commit-name}) branches)))
+
+(defn create-git-commands
+  ([commit-name branches]
+   (create-git-commands {} commit-name branches))
+
+  ([state commit-name branches]
+   (let [repo (or (:repo state) {})
+         head (:head state)
+         commands (atom [])
+         new-head (pick-head head repo branches)]
+
+     ;; checkout to the branch
+     (if-not (= head new-head)
+       (swap! commands conj (git-checkout new-head (keys repo))))
+
+     ;; check if branch has more than one pointing to new-head
+     (let [merging-branches (find-merge-branches new-head repo branches)
+           companion-branches (find-companion-branches new-head merging-branches branches)]
+       (if (> (count merging-branches) 0)
+         (swap! commands conj (git-merge commit-name merging-branches))
+         (swap! commands conj (git-commit commit-name)))
+
+       (let [not-head-branches (concat merging-branches companion-branches)]
+         (swap! commands conj (git-force-branch not-head-branches))))
+
+     (assoc state :commands (flatten (deref commands))
+            :head new-head
+            :repo (update-repo repo branches commit-name)))))
 
 ;; (def config
 ;;   [{:name "Green" :stations ["A", "D", "E"]},
