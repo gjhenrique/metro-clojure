@@ -145,7 +145,7 @@
 
 
 (def config [{:name "Green" :stations ["A" "B" "C"]}]) 
-(def g (build-graph-with-cycles config)) 
+(def g (build-graph config)) 
 
 ;; => (def state1 (traverse-graph-single-station {:graph g :current-node "B"})) 
 ;; state1 
@@ -456,17 +456,17 @@
             :head new-head
             :repo (update-repo repo branches commit-name)))))
 
-;; (def config
-;;   [{:name "Green" :stations ["A", "D", "E"]},
-;;    {:name "Red" :stations ["B", "D", "F", "G"]},
-;;    {:name "Blue" :stations ["C", "D", "F", "H"]}])
-;; (def g (build-graph config))
+(def config
+  [{:name "Green" :stations ["A", "D", "E"]},
+   {:name "Red" :stations ["B", "D", "F", "G"]},
+   {:name "Blue" :stations ["C", "D", "F", "H"]}]) 
+(def g (build-graph config)) 
 
-;; (def alg-state1 (traverse-graph (initial-state g)))
-;; (def git-state1 (create-git-commands (:current-node alg-state1) (:current-line alg-state1))) 
+(def alg-state1 (traverse-graph (initial-state g))) 
+(def git-state1 (create-git-commands (:current-node alg-state1) (:current-line alg-state1))) 
 
-;; (def alg-state2 (traverse-graph alg-state1)) 
-;; (def git-state2 (create-git-commands git-state1 (:current-node alg-state2) (:current-line alg-state2)))
+(def alg-state2 (traverse-graph alg-state1)) 
+(def git-state2 (create-git-commands git-state1 (:current-node alg-state2) (:current-line alg-state2))) 
 
 ;; (def alg-state3 (traverse-graph alg-state2))
 ;; (def git-state3 (create-git-commands git-state2 (:current-node alg-state3) (:current-line alg-state3)))
@@ -481,59 +481,90 @@
 ;; (:repo git-state4)
 ;; ;; => {"Blue" "D", "Red" "D", "Green" "D"}
 
-;; (declare seq-first seq-rest seq-next)
+(declare seq-first seq-rest seq-next) 
 
-;; (deftype MetroGraph [algorithm-state git-state]
-;;   clojure.lang.ISeq
-;;   (first [self] (seq-first algorithm-state git-state))
+#?(:clj
+   (deftype MetroGraph [algorithm-state git-state traversal-algorithm]
+     clojure.lang.ISeq
+     (first [self] (seq-first algorithm-state git-state))
 
-;;   (more [self] (seq-rest self))
+     (more [self] (seq-rest self))
 
-;;   (next [self] (seq-next algorithm-state git-state))
+     (next [self] (seq-next algorithm-state git-state traversal-algorithm))
 
-;;   (seq [self] self))
+     (seq [self] self))) 
 
-;; (defn- seq-first
-;;   [algorithm-state git-state]
-;;   {:station (:current-node algorithm-state)
-;;    :line (:current-line algorithm-state)
-;;    :commands (:commands git-state)
-;;    :state algorithm-state})
+#?(:cljs
+   (deftype MetroGraph [algorithm-state git-state traversal-algorithm]
+     ISeq
+     (-first [self] (seq-first algorithm-state git-state))
 
-;; (defn- seq-rest
-;;   [self]
-;;   (or (next self) '()))
+     (-rest [self] (seq-rest self))
 
-;; (defn- seq-next
-;;   [algorithm-state git-state]
-;;   (let [new-state (traverse-graph algorithm-state)]
-;;     (when-not (nil? new-state)
-;;       (let [new-git-state (create-git-commands git-state
-;;                                                          (:current-node new-state)
-;;                                                          (:current-line new-state))]
-;;         (MetroGraph. new-state new-git-state))))) 
+     INext
+     (-next [self] (seq-next algorithm-state git-state traversal-algorithm))
 
-;; (defn- build-seq
-;;   [initial-state]
-;;   (MetroGraph. initial-state
-;;                (metro.git/create-git-commands
-;;                 (:current-node initial-state)
-;;                 (:current-line initial-state))))
+     ISeqable
+     (-seq [self] self))) 
 
-;; (defn metro-git-seq
-;;   [config]
-;;   (build-seq
-;;    (-> config
-;;        (build-graph)
-;;        (initial-state)
-;;        (traverse-graph)))) 
 
-;; (def config [{:name "Red", :stations ["A", "C"]},
-;;                 {:name "Green", :stations ["B", "C"]}])
+(deftype MetroGraph [algorithm-state git-state]
+  clojure.lang.ISeq
+  (first [self] (seq-first algorithm-state git-state))
 
-;; (def seq1 (metro-git-seq config))
-;; (:station (first seq1))
-;; (:line (last seq1))
+  (more [self] (seq-rest self))
+
+  (next [self] (seq-next algorithm-state git-state))
+
+  (seq [self] self))
+
+(defn- seq-first
+  [algorithm-state git-state]
+  {:station (:current-node algorithm-state)
+   :line (:current-line algorithm-state)
+   :commands (:commands git-state)
+   :state algorithm-state})
+
+(defn- seq-rest
+  [self]
+  (or (next self) '()))
+
+(defn- seq-next
+  [algorithm-state git-state]
+  (let [new-state (traverse-graph algorithm-state)]
+    (when-not (nil? new-state)
+      (let [new-git-state (create-git-commands git-state
+                                                         (:current-node new-state)
+                                                         (:current-line new-state))]
+        (MetroGraph. new-state new-git-state))))) 
+
+(defn- build-seq
+  [initial-state]
+  (MetroGraph. initial-state
+               (metro.git/create-git-commands
+                (:current-node initial-state)
+                (:current-line initial-state))))
+
+(defn metro-git-seq
+  [config]
+  (build-seq
+   (-> config
+       (build-graph)
+       (initial-state)
+       (traverse-graph)))) 
+
+(def nyc-config (metro.file/read-json-file (str "res/nyc.json"))) 
+(def config [{:name "Red", :stations ["A", "C"]},
+              {:name "Green", :stations ["B", "C"]}])
+
+(:commands (first (metro-git-seq nyc-config))) 
+(def seq1 (metro-git-seq nyc-config)) 
+(:line (last (metro-git-seq nyc-config)))
+(:station (first seq1))
+(:line (last seq1))
+
+(def nyc-seq (metro-git-seq nyc-config)) 
+(:commands (first nyc-seq))
 
 
 ;; (def nyc-config (metro.file/read-json-file (str "res/nyc.json")))
@@ -551,6 +582,10 @@
 ;; ;; => 62
 
 ;; (spit "a.txt" (str/join "\n" (mapcat :commands nyc-seq)))
-
-
-
+(use '[clojure.java.shell :only [sh]])
+(spit "nyc.sh" (str/join "\n" (mapcat :commands nyc-seq)))
+(sh "mkdir" "nyc_repo") 
+(sh "mv" "nyc.sh" "nyc_repo") 
+(sh "git" "init" :dir "nyc_repo") 
+(sh "sh" "nyc.sh" :dir "nyc_repo")  
+(println (:out (sh "git" "log" "--oneline"))) 
