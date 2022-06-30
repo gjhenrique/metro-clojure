@@ -16,8 +16,13 @@ This repo takes a *generic* metro map as a json input, builds a DAG and traverse
 # Takes the map ffrom res/sp.json and generates sp.sh
 boot generate-git-commands -c sp -f sp.sh
 
+# New York City
 # Takes the map from res/nyc.json and generates nyc.sh
 boot generate-git-commands -c nyc -f nyc.sh
+
+# Tokyo
+# Takes the map from res/tokyo.json and generates tokyo.sh
+boot generate-git-commands -c tokyo -f tokyo.sh
 ```
 
 ## Viewing the metro graph
